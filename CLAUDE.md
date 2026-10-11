@@ -22,7 +22,7 @@ Dziennik 25-minutowych bloków nauki dla jednej osoby: jedno kliknięcie w kafel
 
 ## Struktura plików
 
-Docelowa struktura (SPEC.md, sekcja 7). Teraz w repozytorium są tylko `SPEC.md`, `.nojekyll` i tymczasowa strona testowa `index.html`.
+Docelowa struktura (SPEC.md, sekcja 7). Po kroku 1 brakuje jeszcze `report.js` (krok 6), `storage-supabase.js` (krok 10) i `views/login.js` (krok 9); widoki to na razie zaślepki z jednym zdaniem.
 
 ```
 index.html                szkielet i trzy zakładki: Dziś, Postęp, Zadania
@@ -39,7 +39,7 @@ js/views/tasks.js         zadania, eksport, import, wylogowanie
 js/views/login.js         ekran logowania (od kroku 9)
 ```
 
-**Strona testowa.** Obecny `index.html` sprawdza, czy `localStorage` przetrwa do następnego dnia (klucz `organizerNauki-test`, ostatnie sprawdzenie we wtorek 13.10.2026). W kroku 1 nie kasuj jej, tylko przenieś do `test-pamieci.html`. `localStorage` jest wspólny dla całej domeny `kubiakraf.github.io`, więc zapisane dane zostaną widoczne pod nowym adresem. Usuń ją dopiero, gdy użytkownik potwierdzi wynik testu.
+**Strona testowa.** `test-pamieci.html` sprawdza, czy `localStorage` przetrwa do następnego dnia (klucz `organizerNauki-test`, ostatnie sprawdzenie we wtorek 13.10.2026). Do kroku 1 była w `index.html`; `localStorage` jest wspólny dla całej domeny `kubiakraf.github.io`, więc dane testu są widoczne pod nowym adresem. Usuń ją dopiero, gdy użytkownik potwierdzi wynik testu.
 
 ## Architektura
 
