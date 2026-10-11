@@ -26,7 +26,7 @@ Jeden użytkownik. Przeglądarka na komputerze w pracy (własne konto Windows), 
 
 - **Zapis bloku to jedno kliknięcie.** Wszystko inne jest opcjonalne.
 - **Pokazujemy to, co zrobione.** Żadnych komunikatów o porażce, serii do zerwania ani „nieudanych dni”.
-- **Dzień bez bloków nie jest spadkiem do zera.** Wolna niedziela nie robi dołka na wykresie.
+- **Wykres jest uczciwy, licznik daje poczucie postępu.** Dzień bez bloków to na wykresie 0. Licznik wszystkich bloków od początku nigdy nie maleje (poza usunięciem pomyłkowego bloku).
 - **Przekroczenie celu to informacja, nie błąd**, np. „4 / 2”.
 - **Czerwony to wyłącznie kolor zadania Frontend**, nigdy sygnał błędu.
 - Interfejs po polsku.
@@ -39,8 +39,9 @@ Jeden użytkownik. Przeglądarka na komputerze w pracy (własne konto Windows), 
 - Na kafelku: nazwa i „zrobione / cel”, np. „1 / 2”. Po osiągnięciu celu pojawia się ✓. Zadanie z celem 0 pokazuje samą liczbę bloków.
 - Kliknięcie kafelka zapisuje blok 25 minut z bieżącą datą i godziną.
 - Nad kafelkami suma dnia, np. „Dziś: 5 z 9 bloków · 2 h 5 min”.
+- Po zapisaniu bloku pojawia się licznik wszystkich bloków od początku, np. „Łącznie: 312 bloków · 130 h”.
 
-**Gotowe, gdy:** dwa kliknięcia w „Python” dają „2 / 2 ✓”, a po odświeżeniu strony stan zostaje.
+**Gotowe, gdy:** dwa kliknięcia w „Python” dają „2 / 2 ✓”, po każdym kliknięciu licznik łączny rośnie o 1, a po odświeżeniu strony stan zostaje.
 
 ### F2. Opis bloku (opcjonalny)
 
@@ -72,10 +73,10 @@ Jeden użytkownik. Przeglądarka na komputerze w pracy (własne konto Windows), 
 - Wykres liniowy: oś X to dni, oś Y to liczba bloków. Jedna linia na zadanie, w kolorze zadania.
 - Przełącznik zakresu: 7 dni albo 30 dni.
 - Kliknięcie w legendę ukrywa lub pokazuje linię. Przy kilku liniach o wartościach 0–4 linie będą się nakładać, więc to ważne.
-- Dzień bez żadnego bloku nie ma punktów (wartość `null`, linia go przeskakuje dzięki `spanGaps`), więc nie robi dołka.
-- Pod wykresem: suma w zakresie (np. „7 dni: 41 bloków · 17 h 5 min”), suma dla każdego zadania i licznik „Bloki w tym miesiącu”, który tylko rośnie.
+- Dzień bez bloków ma wartość 0.
+- Pod wykresem: suma w zakresie (np. „7 dni: 41 bloków · 17 h 5 min”), suma dla każdego zadania i licznik „Łącznie od początku”.
 
-**Gotowe, gdy:** dane z kilku dni dają osobne kolorowe linie, a niedziela bez bloków nie robi dołka.
+**Gotowe, gdy:** dane z kilku dni dają osobne kolorowe linie, a dzień bez bloków pokazuje 0.
 
 ### F6. Raport
 
