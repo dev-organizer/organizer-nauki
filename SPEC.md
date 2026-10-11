@@ -1,6 +1,6 @@
 # Organizer nauki: specyfikacja MVP
 
-Wersja 2 · 11 października 2026
+Wersja 3 · 11 października 2026
 
 Prosty dziennik 25-minutowych bloków nauki. Jedno kliknięcie zapisuje blok, kafelki pokazują postęp dnia względem celu, a wykres pokazuje postęp z dnia na dzień.
 
@@ -42,9 +42,9 @@ Jeden użytkownik. Głównie przeglądarka na komputerze w pracy (własne konto 
 - Na kafelku: nazwa i „zrobione / cel”, np. „1 / 2”. Po osiągnięciu celu pojawia się ✓. Zadanie z celem 0 pokazuje samą liczbę bloków.
 - Kliknięcie kafelka zapisuje blok 25 minut z bieżącą datą i godziną.
 - Nad kafelkami suma dnia, np. „Dziś: 5 z 9 bloków · 2 h 5 min”.
-- Po zapisaniu bloku pojawia się licznik wszystkich bloków od początku, np. „Łącznie: 312 bloków · 130 h”.
+- Licznik wszystkich bloków od początku, np. „Łącznie: 312 bloków · 130 h”, widoczny zawsze. Przy 0 blokach pokazuje „Łącznie: 0 bloków” i podpowiedź „Tu będzie widać Twój postęp”.
 
-**Gotowe, gdy:** dwa kliknięcia w „Python” dają „2 / 2 ✓”, po każdym kliknięciu licznik łączny rośnie o 1, a po odświeżeniu strony stan zostaje.
+**Gotowe, gdy:** dwa kliknięcia w „Python” dają „2 / 2 ✓”, po każdym kliknięciu licznik łączny rośnie o 1, a po odświeżeniu strony stan zostaje. Przy danych bez bloków licznik pokazuje 0 z podpowiedzią.
 
 ### F2. Opis bloku (opcjonalny)
 
@@ -132,7 +132,7 @@ export const DOMAINS = [
 ];
 ```
 
-### 6.2. Dane w aplikacji (kroki 1–7: `localStorage`)
+### 6.2. Dane w aplikacji (do kroku 9: `localStorage`)
 
 Wszystkie dane to jeden obiekt JSON zapisany w `localStorage` pod kluczem `organizerNauki`. Ten sam format ma plik eksportu (F7). Dane startowe:
 
@@ -217,16 +217,16 @@ Uwagi techniczne:
 
 ## 7. Architektura
 
-Statyczna strona (HTML, CSS, JavaScript) na GitHub Pages. W krokach 1–7 dane są w przeglądarce, od kroku 8 w bazie Supabase.
+Statyczna strona (HTML, CSS, JavaScript) na GitHub Pages. Do kroku 9 dane są w przeglądarce, od kroku 10 w bazie Supabase.
 
 ```
-kliknięcie ──► model.js ──► storage ──► localStorage (kroki 1–7)
-                  │                └──► Supabase     (od kroku 8)
-                  │
-                  └──────► bieżący widok rysuje się od nowa
+kliknięcie ──► app.js ──► storage ──► localStorage (do kroku 9) albo Supabase (od kroku 10)
+                            │
+                            ├── zapis udany ──► zmiana stanu ──► widok rysuje się od nowa
+                            └── błąd zapisu ──► komunikat z „Spróbuj ponownie”, stan bez zmian
 ```
 
-Cały stan to jeden obiekt w pamięci. Każda zmiana to trzy kroki: aktualizacja obiektu, zapis przez moduł `storage`, ponowne narysowanie bieżącego widoku. Trzy zakładki w jednym pliku HTML: Dziś, Postęp, Zadania. Od kroku 9 przed nimi ekran logowania.
+Cały stan to jeden obiekt w pamięci. Każda zmiana to trzy kroki: zapis przez moduł `storage`, a dopiero po udanym zapisie aktualizacja obiektu i ponowne narysowanie bieżącego widoku. Dzięki tej kolejności ekran nigdy nie pokazuje czegoś, czego nie udało się zapisać. Trzy zakładki w jednym pliku HTML: Dziś, Postęp, Zadania. Od kroku 9 przed nimi ekran logowania.
 
 **Wspólny interfejs zapisu.** Oba moduły zapisu mają te same funkcje i od pierwszego dnia są asynchroniczne (zwracają `Promise`), także wersja na `localStorage`. Dzięki temu przejście na bazę to wymiana jednego pliku, bez zmian w widokach.
 
@@ -242,21 +242,25 @@ exportAll()        → Promise<data>
 Pliki:
 
 ```
-index.html                szkielet i trzy zakładki
+index.html                szkielet i trzy zakładki: Dziś, Postęp, Zadania
+tests.html                strona testów (od kroku 2b)
 css/style.css
-js/app.js                 start, wybór modułu zapisu, zakładki, odświeżanie widoku
-js/storage-local.js       zapis w localStorage (kroki 1–7)
-js/storage-supabase.js    zapis w Supabase (od kroku 8)
+js/app.js                 start, wybór modułu zapisu, akcje, zakładki, odświeżanie widoku
+js/storage-local.js       zapis w localStorage (do kroku 9)
+js/storage-supabase.js    zapis w Supabase (od kroku 10)
 js/model.js               dziedziny, operacje na danych, zliczenia
 js/dates.js               daty lokalne, zakresy dni, polskie skróty dni
-js/report.js              tekst raportu w Markdown
+js/report.js              tekst raportu w Markdown (od kroku 6)
 js/views/today.js         ekran Dziś, opis bloku, lista dnia
 js/views/progress.js      wykres i sumy
 js/views/tasks.js         zadania, eksport, import, wylogowanie
 js/views/login.js         ekran logowania (od kroku 9)
+js/tests/                 testy logiki (od kroku 2b)
 ```
 
-**Hosting to nie to samo co przechowywanie danych.** GitHub Pages tylko wysyła pliki aplikacji. W krokach 1–7 dane zostają w przeglądarce, osobno dla każdego komputera i adresu. Od kroku 8 dane są w bazie i każde urządzenie po zalogowaniu widzi to samo.
+**Testy.** `tests.html` uruchamia testy funkcji z `model.js`, `dates.js` i `report.js` i pokazuje wynik na ekranie: które przeszły, a które nie i dlaczego. Testy nie dotykają `localStorage`, bo strona testów trafia też na GitHub Pages, obok prawdziwych danych. Dzięki testom od razu widać, że nowa funkcja zepsuła starą.
+
+**Hosting to nie to samo co przechowywanie danych.** GitHub Pages tylko wysyła pliki aplikacji. Do kroku 9 dane zostają w przeglądarce, osobno dla każdego komputera i adresu. Od kroku 10 dane są w bazie i każde urządzenie po zalogowaniu widzi to samo.
 
 ## 8. Stos technologiczny
 
@@ -264,11 +268,12 @@ js/views/login.js         ekran logowania (od kroku 9)
 |---|---|---|
 | Kod | HTML, CSS, JavaScript (moduły ES), bez frameworka | zero konfiguracji, działa przez vscode.dev i tunel, każdą linię da się przeczytać i zrozumieć |
 | Wykres | Chart.js 4.4.1 z CDN jsDelivr | wykres liniowy i klikalna legenda bez dodatkowej pracy |
-| Dane, kroki 1–7 | `localStorage` | działa od razu, bez kont i konfiguracji |
+| Dane, do kroku 9 | `localStorage` | działa od razu, bez kont i konfiguracji |
 | Baza i logowanie, od kroku 8 | Supabase, plan darmowy, region UE (Frankfurt) | baza Postgres, gotowe logowanie i API bez pisania własnego serwera |
 | Klient bazy | supabase-js 2.45.4 z CDN jsDelivr | oficjalna biblioteka, bez instalowania |
 | Hosting | GitHub Pages | darmowy, wdrożenie przez `git push`; publiczne repozytorium to też portfolio |
 | Uruchomienie lokalne | `python -m http.server 8000` i przekierowanie portu w VS Code (zakładka Ports) | moduły ES nie działają z pliku otwartego przez `file://` |
+| Testy | strona `tests.html` z własną, krótką funkcją sprawdzającą | bez npm i bez bibliotek; testy działają w tej samej przeglądarce co aplikacja |
 
 Wczytanie bibliotek:
 
@@ -319,7 +324,7 @@ Propozycja instrukcji dla projektu w Claude:
 
 ## 10. Plan implementacji
 
-Każdy krok to 1–2 bloki Claude Code i kończy się czymś, co działa i co da się sprawdzić. Kroki 0–7 (ok. 14 bloków) dają działającą aplikację na jednym komputerze. Kroki 8–11 (ok. 6 bloków) przenoszą dane do bazy. Razem ok. 20 bloków, czyli ok. 8,5 godziny; przy 2–3 blokach Claude Code dziennie to ok. półtora tygodnia.
+Każdy krok to 1–2 bloki Claude Code i kończy się czymś, co działa i co da się sprawdzić. Kroki 0–7 (ok. 15 bloków) dają działającą aplikację na jednym komputerze. Kroki 8–11 (ok. 6 bloków) przenoszą dane do bazy. Razem ok. 21 bloków, czyli ok. 9 godzin; przy 2–3 blokach Claude Code dziennie to ok. półtora tygodnia.
 
 Baza wchodzi po wersji lokalnej, a nie od pierwszego dnia, bo:
 
@@ -330,13 +335,15 @@ Baza wchodzi po wersji lokalnej, a nie od pierwszego dnia, bo:
 Zasady pracy:
 
 - Jeden krok na sesję Claude Code. Prompt w stylu: „Zaimplementuj F1 ze SPEC.md. Trzymaj się zasad z sekcji 3.”
-- Po każdym działającym kroku: commit i push. GitHub Pages aktualizuje stronę po ok. minucie.
+- Od kroku 2b nowa logika dostaje testy w `tests.html`, a przed commitem przechodzą wszystkie testy.
+- Po każdym działającym kroku: commit i push, po Twojej zgodzie. GitHub Pages aktualizuje stronę po ok. minucie.
+- Po skończonym kroku dopisujemy przy nim „**Zrobione:**” z datą. Następny krok to pierwszy bez tego dopisku.
 - Nowy pomysł w trakcie pracy trafia do sekcji 11, a nie do kodu.
 - Przed zmianą formatu danych: eksport kopii.
 
 ### Krok 0. Przygotowanie i test ryzyka (1–2 bloki)
 
-Stan na 11.10.2026: repozytorium i GitHub Pages działają, test pamięci przeglądarki przeszedł zamknięcie przeglądarki i restart komputera. Zostało: sprawdzenie następnego dnia i CLAUDE.md.
+Stan na 11.10.2026: repozytorium i GitHub Pages działają, CLAUDE.md jest w repozytorium, test pamięci przeglądarki przeszedł zamknięcie przeglądarki i restart komputera. Zostało: sprawdzenie następnego dnia (wtorek 13.10.2026).
 
 - Prompt: „Przeczytaj SPEC.md i utwórz CLAUDE.md z zasadami projektu, stosem i strukturą plików.”
 
@@ -348,9 +355,22 @@ Stan na 11.10.2026: repozytorium i GitHub Pages działają, test pamięci przegl
 
 **Gotowe, gdy:** w narzędziach deweloperskich (F12 → Application → Local Storage) widać klucz `organizerNauki` z 5 zadaniami.
 
+**Zrobione:** 11.10.2026.
+
 ### Krok 2. Ekran „Dziś” (2 bloki)
 
 Funkcja F1. **Gotowe, gdy:** spełniony warunek z F1.
+
+**Zrobione:** 11.10.2026. Licznik łączny był wtedy ukryty do pierwszego zapisu; widoczny zawsze i z podpowiedzią przy 0 jest od kroku 2b.
+
+### Krok 2b. Testy i licznik łączny (1 blok)
+
+Dopisany 11.10.2026, po kroku 2. Testy pozwalają od razu zauważyć, że nowa funkcja zepsuła starą.
+
+- Strona `tests.html` z krótką funkcją sprawdzającą (bez bibliotek) i testy funkcji, które już są w `model.js` i `dates.js`.
+- Licznik łączny według nowego opisu w F1: widoczny zawsze, przy 0 blokach z podpowiedzią.
+
+**Gotowe, gdy:** `tests.html` pokazuje, że wszystkie testy przechodzą; celowo zepsuty test pokazuje, który i dlaczego (potem cofamy zmianę); spełniony jest warunek z F1.
 
 ### Krok 3. Opis bloku i lista dnia (2 bloki)
 

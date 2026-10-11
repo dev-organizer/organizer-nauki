@@ -1,7 +1,7 @@
 // Start aplikacji, wybór modułu zapisu, zakładki i odświeżanie widoku.
 //
-// Każda zmiana danych to trzy kroki: aktualizacja stanu,
-// zapis przez moduł storage, ponowne narysowanie bieżącego widoku.
+// Każda zmiana danych to trzy kroki: zapis przez moduł storage, a dopiero
+// po udanym zapisie aktualizacja stanu i ponowne narysowanie bieżącego widoku.
 
 // Moduł zapisu. W kroku 10 podmieniamy tu import na storage-supabase.js.
 import * as storage from "./storage-local.js";
