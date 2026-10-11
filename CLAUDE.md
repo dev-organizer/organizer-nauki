@@ -2,7 +2,7 @@
 
 Dziennik 25-minutowych bloków nauki dla jednej osoby: jedno kliknięcie w kafelek zapisuje blok, kafelki pokazują „zrobione / cel”, wykres pokazuje postęp z dnia na dzień.
 
-**Źródłem prawdy jest [SPEC.md](SPEC.md).** Przed każdym krokiem przeczytaj odpowiednią funkcję (F1–F8) i krok z sekcji 10. Jeśli kod, CLAUDE.md i SPEC.md się różnią, zapytaj, zamiast zgadywać. Gdy zmieniasz zasadę zapisaną w obu plikach, popraw ją w obu.
+**Źródłem prawdy są [SPEC.md](SPEC.md) (czym jest aplikacja: funkcje, dane, architektura) i [PLAN.md](PLAN.md) (kroki budowy, stan prac, backlog).** Przed każdym krokiem przeczytaj krok w PLAN.md i funkcje (F1–F8) ze SPEC.md, do których się odwołuje. Jeśli kod, CLAUDE.md, SPEC.md i PLAN.md się różnią, zapytaj, zamiast zgadywać. Gdy zmieniasz zasadę zapisaną w kilku plikach, popraw ją we wszystkich.
 
 ## Komunikacja
 
@@ -27,7 +27,7 @@ Dziennik 25-minutowych bloków nauki dla jednej osoby: jedno kliknięcie w kafel
 - Testy nie dotykają `localStorage`: `tests.html` jest też na GitHub Pages, obok prawdziwych danych.
 - Krok jest skończony, gdy:
   1. przechodzą wszystkie testy, nie tylko nowe;
-  2. warunek „Gotowe, gdy” i scenariusz „Sprawdzenie” z kroku w SPEC.md są wykonane w przeglądarce, a konsola (F12) jest bez błędów;
+  2. warunek „Gotowe, gdy” i scenariusz „Sprawdzenie” z kroku w PLAN.md są wykonane w przeglądarce, a konsola (F12) jest bez błędów;
   3. warunki wcześniejszych kroków, których dotyczyła zmiana, nadal są spełnione.
 - Sprawdzaj na serwerze lokalnym. Ma osobny `localStorage`, więc klikanie nie zmienia prawdziwych danych z GitHub Pages. Od kroku 11 baza jest wspólna: na serwerze lokalnym tylko konto testowe.
 - GitHub Pages po pushu sprawdzaj tylko do odczytu (strona, `tests.html`, konsola), bez klikania kafelków. Przeglądarka trzyma pliki do 10 minut, więc najpierw Ctrl+Shift+R.
@@ -107,12 +107,12 @@ Z sekcji 3 SPEC.md; obowiązują w każdym widoku:
 
 ## Zakres i sposób pracy
 
-- Jeden krok z sekcji 10 na sesję. Nie wykonuj kroków naprzód.
-- Sesję kroku zaczynaj od planu i pytań z punktu „Do rozstrzygnięcia” przy kroku w SPEC.md. Kod dopiero po decyzjach użytkownika.
+- Jeden krok z PLAN.md na sesję. Nie wykonuj kroków naprzód.
+- Sesję kroku zaczynaj od planu i pytań z punktu „Do rozstrzygnięcia” przy kroku w PLAN.md. Kod dopiero po decyzjach użytkownika.
 - W kroku zmieniaj tylko to, czego krok wymaga. Poprawki „przy okazji” (porządki w kodzie, zmiany nazw, wygląd) najpierw zaproponuj.
-- Nie dodawaj rzeczy z sekcji 5 („Poza zakresem MVP”). Nowy pomysł w trakcie pracy dopisz do sekcji 11 SPEC.md (backlog), nie do kodu.
+- Nie dodawaj rzeczy z sekcji 5 („Poza zakresem MVP”). Nowy pomysł w trakcie pracy dopisz do backlogu w PLAN.md, nie do kodu.
 - Nowa logika w `model.js`, `dates.js` albo `report.js` dostaje testy w tym samym kroku.
-- Plan prowadzimy w SPEC.md, sekcja 10. Po skończonym kroku dopisz przy nim „**Zrobione:** DD.MM.RRRR”. Gdy decyzja zmienia to, co opisuje SPEC.md, popraw SPEC.md w tym samym commicie.
+- Plan prowadzimy w PLAN.md. Po skończonym kroku dopisz przy nim „**Zrobione:** DD.MM.RRRR”. Gdy decyzja zmienia to, co opisuje SPEC.md (funkcje, dane, architekturę), popraw SPEC.md w tym samym commicie.
 - Po działającym kroku zaproponuj commit; commit i push rób po zgodzie użytkownika. GitHub Pages aktualizuje stronę po ok. minucie.
 - Opisy commitów po polsku, w trybie rozkazującym, jak w historii („Dodaj …”, „Popraw …”).
 - Nie zmieniaj lokalnej konfiguracji gita (e-mail w repozytorium to adres GitHub noreply). Folder `.claude/` jest w `.gitignore`; nie commituj go.
