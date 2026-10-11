@@ -14,8 +14,8 @@ Dziennik 25-minutowych bloków nauki dla jednej osoby: jedno kliknięcie w kafel
 
 - HTML, CSS i JavaScript z modułami ES. Bez frameworka, bez npm, bez kroku budowania. Nie dodawaj zależności ani narzędzi bez pytania (React z Vite dopiero po kursie Reacta, nie w MVP).
 - Chart.js 4.4.1 z jsDelivr jako zwykły `<script>` (UMD) przed skryptami modułów; w kodzie dostępny jako globalne `Chart`.
-- supabase-js 2.45.4 z jsDelivr (`+esm`) przez `import`, dopiero od kroku 9.
-- Dane: `localStorage` pod kluczem `organizerNauki`; w kroku 10 przechodzą do Supabase.
+- supabase-js 2.45.4 z jsDelivr (`+esm`) przez `import`, dopiero od kroku 10.
+- Dane: `localStorage` pod kluczem `organizerNauki`; w kroku 11 przechodzą do Supabase.
 - Hosting: GitHub Pages pod adresem `https://kubiakraf.github.io/organizer-nauki/`. Plik `.nojekyll` musi zostać w repozytorium.
 
 ## Uruchomienie i testy
@@ -27,9 +27,10 @@ Dziennik 25-minutowych bloków nauki dla jednej osoby: jedno kliknięcie w kafel
 - Testy nie dotykają `localStorage`: `tests.html` jest też na GitHub Pages, obok prawdziwych danych.
 - Krok jest skończony, gdy:
   1. przechodzą wszystkie testy, nie tylko nowe;
-  2. warunek „Gotowe, gdy” ze SPEC.md jest sprawdzony w przeglądarce, a konsola (F12) jest bez błędów;
+  2. warunek „Gotowe, gdy” i scenariusz „Sprawdzenie” z kroku w SPEC.md są wykonane w przeglądarce, a konsola (F12) jest bez błędów;
   3. warunki wcześniejszych kroków, których dotyczyła zmiana, nadal są spełnione.
-- Sprawdzaj na serwerze lokalnym. Ma osobny `localStorage`, więc klikanie nie zmienia prawdziwych danych z GitHub Pages.
+- Sprawdzaj na serwerze lokalnym. Ma osobny `localStorage`, więc klikanie nie zmienia prawdziwych danych z GitHub Pages. Od kroku 11 baza jest wspólna: na serwerze lokalnym tylko konto testowe.
+- GitHub Pages po pushu sprawdzaj tylko do odczytu (strona, `tests.html`, konsola), bez klikania kafelków. Przeglądarka trzyma pliki do 10 minut, więc najpierw Ctrl+Shift+R.
 
 ## Struktura plików
 
@@ -40,15 +41,15 @@ index.html                szkielet i trzy zakładki: Dziś, Postęp, Zadania
 tests.html                strona testów (od kroku 2b)
 css/style.css
 js/app.js                 start, wybór modułu zapisu, akcje, zakładki, odświeżanie widoku
-js/storage-local.js       zapis w localStorage (do kroku 9)
-js/storage-supabase.js    zapis w Supabase (od kroku 10)
+js/storage-local.js       zapis w localStorage (do kroku 10)
+js/storage-supabase.js    zapis w Supabase (od kroku 11)
 js/model.js               dziedziny, operacje na danych, zliczenia
 js/dates.js               daty lokalne, zakresy dni, polskie skróty dni
 js/report.js              tekst raportu w Markdown (od kroku 6)
 js/views/today.js         ekran Dziś, opis bloku, lista dnia
 js/views/progress.js      wykres i sumy
 js/views/tasks.js         zadania, eksport, import, wylogowanie
-js/views/login.js         ekran logowania (od kroku 9)
+js/views/login.js         ekran logowania (od kroku 10)
 js/tests/                 testy logiki (od kroku 2b)
 ```
 
@@ -60,7 +61,7 @@ js/tests/                 testy logiki (od kroku 2b)
 - Widoki nigdy nie używają `localStorage` ani Supabase bezpośrednio, tylko modułu `storage`. Moduł wybiera `app.js`, więc przejście na bazę to zmiana jednego importu.
 - Widoki zmieniają dane przez obiekt `actions` z `app.js` (np. `actions.addBlock(taskId)`), przekazywany jako trzeci argument `render(container, state, actions)`.
 - Oba moduły zapisu mają ten sam, asynchroniczny interfejs (zwracają `Promise`, także wersja lokalna):
-  `load()`, `addBlock(block)`, `deleteBlock(id)`, `saveTask(task)` (dodaje albo aktualizuje), `replaceAll(data)`, `exportAll()`.
+  `load()`, `addBlock(block)`, `updateBlock(block)` (np. dopisany opis), `deleteBlock(id)`, `saveTask(task)` (dodaje albo aktualizuje), `replaceAll(data)`, `exportAll()`.
 - Logika liczenia (sumy, cele, zakresy dni) w `model.js` i `dates.js`, nie w widokach.
 - Wszystkie ścieżki względne (`./js/app.js`, nie `/js/app.js`), bo strona działa pod podkatalogiem `/organizer-nauki/`.
 
@@ -74,7 +75,7 @@ Pełny model w SPEC.md, sekcja 6.
 - **Daty liczone lokalnie.** Nigdy `toISOString()` do daty bloku: zwraca czas UTC i blok zapisany tuż po północy trafiłby na poprzedni dzień. Format `RRRR-MM-DD` i `GG:MM`.
 - `minutes` w MVP zawsze 25. `note` to pusty tekst, gdy brak opisu (nie `null`).
 - Zadań się nie usuwa, tylko archiwizuje (`archived: true`). Ich bloki zostają w historii i na wykresie.
-- Supabase: w bazie `snake_case`, w aplikacji `camelCase`; tłumaczy to wyłącznie `storage-supabase.js`. Zapytanie zwraca najwyżej 1000 wierszy, więc bloki pobieraj stronami (`range`) albo z potrzebnego zakresu dat, a licznik łączny licz zapytaniem z `count`.
+- Supabase: w bazie `snake_case`, w aplikacji `camelCase`; tłumaczy to wyłącznie `storage-supabase.js`. Zapytanie zwraca najwyżej 1000 wierszy, więc `load()` pobiera wszystkie bloki stronami (`range`), a widoki liczą z pełnej listy. Godzinę z bazy (`07:40:00`) skracaj do `GG:MM`.
 
 ## Zasady projektowe
 
@@ -93,9 +94,10 @@ Z sekcji 3 SPEC.md; obowiązują w każdym widoku:
 - Tekst wpisany przez użytkownika (nazwy zadań, opisy bloków, dane z importu) wstawiaj przez `textContent`, nigdy przez `innerHTML`.
 - Repozytorium jest publiczne: nie wpisuj do plików prywatnego e-maila ani innych danych osobowych.
 - Żadnych kluczy do usług AI w kodzie strony (tylko w Edge Function, i to po MVP).
-- Od kroku 8 (Supabase):
+- Od kroku 9 (Supabase):
   - adres projektu i klucz publiczny (`anon` / `publishable`) mogą być w kodzie strony. Dane chroni RLS z SPEC.md, sekcja 6.3; obie tabele muszą mieć RLS włączony;
-  - klucz `service_role` (secret) nigdy nie trafia do kodu, plików ani repozytorium.
+  - klucz `service_role` (secret) nigdy nie trafia do kodu, plików ani repozytorium;
+  - hasła (także konta testowego) nie trafiają do plików ani do czatu. Logowanie przy sprawdzaniu wykonuje użytkownik.
 
 ## Styl kodu
 
@@ -106,6 +108,7 @@ Z sekcji 3 SPEC.md; obowiązują w każdym widoku:
 ## Zakres i sposób pracy
 
 - Jeden krok z sekcji 10 na sesję. Nie wykonuj kroków naprzód.
+- Sesję kroku zaczynaj od planu i pytań z punktu „Do rozstrzygnięcia” przy kroku w SPEC.md. Kod dopiero po decyzjach użytkownika.
 - W kroku zmieniaj tylko to, czego krok wymaga. Poprawki „przy okazji” (porządki w kodzie, zmiany nazw, wygląd) najpierw zaproponuj.
 - Nie dodawaj rzeczy z sekcji 5 („Poza zakresem MVP”). Nowy pomysł w trakcie pracy dopisz do sekcji 11 SPEC.md (backlog), nie do kodu.
 - Nowa logika w `model.js`, `dates.js` albo `report.js` dostaje testy w tym samym kroku.
