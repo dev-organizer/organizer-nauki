@@ -98,3 +98,23 @@ export function dailyGoalTotal(tasks) {
 export function totalMinutes(blocks) {
   return blocks.reduce((sum, block) => sum + block.minutes, 0);
 }
+
+// Czy zadanie osiągnęło dzienny cel. Zadanie bez celu (0) nie ma czego osiągać.
+export function isGoalReached(done, dailyGoal) {
+  return dailyGoal > 0 && done >= dailyGoal;
+}
+
+// Liczba bloków z polską odmianą: 1 blok, 3 bloki, 5 bloków, 12 bloków, 22 bloki.
+export function formatBlocks(count) {
+  if (count === 1) {
+    return "1 blok";
+  }
+  const lastDigit = count % 10;
+  const lastTwoDigits = count % 100;
+  const endsWith2to4 = lastDigit >= 2 && lastDigit <= 4;
+  const endsWith12to14 = lastTwoDigits >= 12 && lastTwoDigits <= 14;
+  if (endsWith2to4 && !endsWith12to14) {
+    return `${count} bloki`;
+  }
+  return `${count} bloków`;
+}

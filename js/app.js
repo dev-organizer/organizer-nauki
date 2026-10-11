@@ -5,6 +5,8 @@
 
 // Moduł zapisu. W kroku 10 podmieniamy tu import na storage-supabase.js.
 import * as storage from "./storage-local.js";
+import { createBlock } from "./model.js";
+import { todayString } from "./dates.js";
 import * as todayView from "./views/today.js";
 import * as progressView from "./views/progress.js";
 import * as tasksView from "./views/tasks.js";
@@ -18,8 +20,15 @@ const VIEWS = {
 
 // Cały stan aplikacji w jednym obiekcie.
 const state = {
-  data: null,    // { version, tasks, blocks } z modułu zapisu
-  tab: "today",  // bieżąca zakładka
+  data: null,       // { version, tasks, blocks } z modułu zapisu
+  tab: "today",     // bieżąca zakładka
+  lastBlock: null,  // ostatni blok zapisany od otwarcia strony
+};
+
+// Operacje na danych, które widoki mogą wywołać.
+// Widoki nie znają modułu zapisu, więc nie zależą od tego, gdzie leżą dane.
+const actions = {
+  addBlock,
 };
 
 const errorBox = document.getElementById("error");
@@ -32,7 +41,17 @@ let retryAction = null;
 // Pokazuje komunikat o błędzie z przyciskiem „Spróbuj ponownie”.
 function showError(message, retry) {
   errorText.textContent = message;
-  retryAction = retry;
+  // Jeśli wcześniejszy błąd wciąż czeka na ponowienie, nie gubimy go:
+  // „Spróbuj ponownie” powtórzy obie operacje.
+  const previousRetry = retryAction;
+  if (previousRetry === null) {
+    retryAction = retry;
+  } else {
+    retryAction = () => {
+      previousRetry();
+      retry();
+    };
+  }
   errorBox.hidden = false;
 }
 
@@ -47,6 +66,9 @@ retryButton.addEventListener("click", () => {
   retry();
 });
 
+// Dzień, dla którego ostatnio narysowaliśmy widok.
+let renderedDay = null;
+
 // Rysuje od nowa bieżącą zakładkę, a pozostałe chowa.
 function render() {
   if (state.data === null) {
@@ -60,11 +82,12 @@ function render() {
     section.hidden = !isCurrent;
     if (isCurrent) {
       button.setAttribute("aria-current", "page");
-      view.render(section, state);
+      view.render(section, state, actions);
     } else {
       button.removeAttribute("aria-current");
     }
   }
+  renderedDay = todayString();
 }
 
 for (const button of document.querySelectorAll("[data-tab]")) {
@@ -72,6 +95,36 @@ for (const button of document.querySelectorAll("[data-tab]")) {
     state.tab = button.dataset.tab;
     render();
   });
+}
+
+// Przypięta karta bywa otwarta przez noc. Co minutę sprawdzamy, czy zaczął się
+// nowy dzień; jeśli tak, rysujemy widok od nowa, żeby „Dziś” nie pokazywało wczoraj.
+setInterval(() => {
+  if (todayString() !== renderedDay) {
+    render();
+  }
+}, 60 * 1000);
+
+// Zapisuje blok 25 minut wybranego zadania z bieżącą datą i godziną.
+async function addBlock(taskId) {
+  const block = createBlock({ taskId });
+  await saveBlock(block);
+}
+
+// Stan zmieniamy dopiero po udanym zapisie, żeby kafelek nigdy nie pokazał
+// bloku, którego nie ma w pamięci. Przy błędzie „Spróbuj ponownie” zapisuje
+// ten sam blok, z godziną pierwotnego kliknięcia.
+async function saveBlock(block) {
+  try {
+    await storage.addBlock(block);
+  } catch (error) {
+    const task = state.data.tasks.find((candidate) => candidate.id === block.taskId);
+    showError(`Nie udało się zapisać bloku (${task.name}, ${block.time}). ${error.message}`, () => saveBlock(block));
+    return;
+  }
+  state.data.blocks.push(block);
+  state.lastBlock = block;
+  render();
 }
 
 async function start() {

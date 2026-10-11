@@ -22,7 +22,7 @@ Dziennik 25-minutowych bloków nauki dla jednej osoby: jedno kliknięcie w kafel
 
 ## Struktura plików
 
-Docelowa struktura (SPEC.md, sekcja 7). Po kroku 1 brakuje jeszcze `report.js` (krok 6), `storage-supabase.js` (krok 10) i `views/login.js` (krok 9); widoki to na razie zaślepki z jednym zdaniem.
+Docelowa struktura (SPEC.md, sekcja 7). Brakuje jeszcze `report.js` (krok 6), `storage-supabase.js` (krok 10) i `views/login.js` (krok 9). Po kroku 2 działa ekran „Dziś” (kafelki, suma dnia, licznik łączny); `progress.js` i `tasks.js` to na razie zaślepki z jednym zdaniem.
 
 ```
 index.html                szkielet i trzy zakładki: Dziś, Postęp, Zadania
@@ -45,6 +45,7 @@ js/views/login.js         ekran logowania (od kroku 9)
 
 - Cały stan to jeden obiekt w pamięci. Każda zmiana: aktualizacja obiektu → zapis przez moduł `storage` → ponowne narysowanie bieżącego widoku.
 - Widoki nigdy nie używają `localStorage` ani Supabase bezpośrednio, tylko modułu `storage`. Moduł wybiera `app.js`, więc przejście na bazę to zmiana jednego importu.
+- Widoki zmieniają dane przez obiekt `actions` z `app.js` (np. `actions.addBlock(taskId)`), przekazywany jako trzeci argument `render(container, state, actions)`. Akcja zapisuje przez `storage`, dopiero po udanym zapisie zmienia stan i rysuje widok, a przy błędzie pokazuje komunikat z „Spróbuj ponownie”.
 - Oba moduły zapisu mają ten sam, asynchroniczny interfejs (zwracają `Promise`, także wersja lokalna):
   `load()`, `addBlock(block)`, `deleteBlock(id)`, `saveTask(task)` (dodaje albo aktualizuje), `replaceAll(data)`, `exportAll()`.
 - Logika liczenia (sumy, cele, zakresy dni) w `model.js` i `dates.js`, nie w widokach.

@@ -1,1 +1,194 @@
-/* Wygląd aplikacji. Krok 1 jest celowo bez wyglądu; style dochodzą od kroku 2. */
+/* Wygląd aplikacji. Szlif całości w kroku 7. */
+
+:root {
+  --text: #1f2328;
+  --text-muted: #59636e;
+  --background: #f6f7f9;
+  --surface: #ffffff;
+  --border: #d1d9e0;
+  /* Błędy nigdy na czerwono: czerwony to kolor zadania Frontend. */
+  --notice-background: #37474f;
+  --notice-text: #ffffff;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  font-size: 1rem;
+  line-height: 1.4;
+  color: var(--text);
+  background: var(--background);
+}
+
+button {
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+}
+
+/* Zakładki */
+
+nav {
+  display: flex;
+  gap: 0.25rem;
+  padding: 0.5rem 1rem 0;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+}
+
+nav button {
+  padding: 0.6rem 1rem;
+  background: none;
+  border: none;
+  border-bottom: 3px solid transparent;
+  color: var(--text-muted);
+}
+
+nav button[aria-current="page"] {
+  color: var(--text);
+  font-weight: 600;
+  border-bottom-color: var(--text);
+}
+
+/* Komunikat o błędzie. Przyklejony do dołu okna, żeby pojawiając się nie przesuwał
+   kafelków: następne kliknięcie musi trafić w ten kafelek, w który celujesz. */
+
+#error {
+  position: fixed;
+  bottom: 1rem;
+  left: 1rem;
+  right: 1rem;
+  z-index: 1;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 1rem;
+  max-width: 48rem;
+  margin: 0 auto;
+  box-shadow: 0 0.25rem 1rem rgba(0, 0, 0, 0.25);
+  padding: 0.75rem 1rem;
+  border-radius: 0.5rem;
+  background: var(--notice-background);
+  color: var(--notice-text);
+}
+
+/* Bez tego display: flex nadpisałby atrybut hidden. */
+#error[hidden] {
+  display: none;
+}
+
+#error p {
+  flex: 1 1 16rem;
+  margin: 0;
+}
+
+#error button {
+  padding: 0.4rem 0.9rem;
+  border: 1px solid var(--notice-text);
+  border-radius: 0.375rem;
+  background: none;
+  color: var(--notice-text);
+}
+
+/* Zawartość zakładek */
+
+main {
+  max-width: 48rem;
+  margin: 0 auto;
+  /* Zapas na dole, żeby komunikat o błędzie nie zasłonił końca strony. */
+  padding: 1rem 1rem 6rem;
+}
+
+/* Ekran „Dziś”: suma dnia i licznik łączny */
+
+.today-header {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 0.25rem 1.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.day-summary {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.total {
+  margin: 0;
+  color: var(--text-muted);
+}
+
+/* Do pierwszego zapisu licznik jest niewidoczny, ale zajmuje swoje miejsce. */
+.total-waiting {
+  visibility: hidden;
+}
+
+/* Dziedziny i kafelki */
+
+.domain h2 {
+  margin: 1.25rem 0 0.5rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-muted);
+}
+
+.tiles {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(10rem, 1fr));
+  gap: 0.75rem;
+}
+
+.tile {
+  --task-color: #888888; /* zastępowany kolorem zadania w today.js */
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.5rem;
+  min-height: 5.5rem;
+  padding: 0.75rem 1rem;
+  text-align: left;
+  border: 1px solid var(--border);
+  border-left: 0.5rem solid var(--task-color);
+  border-radius: 0.5rem;
+  background: var(--surface);
+  /* Jasne tło w kolorze zadania. Starsza przeglądarka zostanie przy białym. */
+  background: color-mix(in srgb, var(--task-color) 12%, var(--surface));
+  transition: transform 0.05s;
+}
+
+.tile:hover {
+  border-color: var(--task-color);
+}
+
+.tile:active {
+  transform: scale(0.97);
+}
+
+.tile:focus-visible {
+  outline: 3px solid var(--text);
+  outline-offset: 2px;
+}
+
+/* Cel osiągnięty: mocniejsze tło, żeby od razu było widać, co jest jeszcze przed celem. */
+.tile-goal-reached {
+  background: color-mix(in srgb, var(--task-color) 30%, var(--surface));
+}
+
+.tile-name {
+  font-weight: 600;
+}
+
+.tile-count {
+  font-size: 1.5rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}

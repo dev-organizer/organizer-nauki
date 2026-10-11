@@ -61,3 +61,16 @@ export function dayLabel(dateString) {
   const [, month, day] = dateString.split("-");
   return `${dayShort(dateString)} ${day}.${month}`;
 }
+
+// Czas w minutach jako tekst: 125 → "2 h 5 min", 7800 → "130 h", 25 → "25 min".
+export function formatDuration(minutes) {
+  const hours = Math.floor(minutes / 60);
+  const restMinutes = minutes % 60;
+  if (hours === 0) {
+    return `${restMinutes} min`;
+  }
+  if (restMinutes === 0) {
+    return `${hours} h`;
+  }
+  return `${hours} h ${restMinutes} min`;
+}
