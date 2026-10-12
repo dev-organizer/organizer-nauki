@@ -17,7 +17,7 @@ Numery kroków są tylko w PLAN.md. Tu i w SPEC.md piszemy **wersja lokalna** (1
 - HTML, CSS i JavaScript z modułami ES. Bez frameworka, bez npm, bez kroku budowania. Nie dodawaj zależności ani narzędzi bez pytania (React z Vite dopiero po kursie Reacta, nie w MVP).
 - Biblioteki leżą w repozytorium (`js/vendor/`), nie na CDN (powody: SPEC.md, sekcja 8). Każdą pobierasz raz z paczki npm, a obok kładziesz jej licencję:
   - Chart.js 4.4.1: `js/vendor/chart.umd.js` (z `dist/chart.umd.js`). Wczytuje go `views/progress.js` przy pierwszym otwarciu „Postępu” (dodany `<script>`, czekanie na `load`); potem w kodzie globalne `Chart`. Ekran „Dziś” nie czeka na wykres.
-  - supabase-js 2.x, tylko w wersji z bazą: `js/vendor/supabase.js` (z `dist/umd/supabase.js`), w wersji aktualnej w dniu dodania, wpisanej tutaj i w SPEC.md. Zwykły `<script>` przed `app.js`; w kodzie globalne `supabase`. Plik `+esm` z jsDelivr się nie nadaje: importuje kolejne pliki z jsDelivr.
+  - supabase-js 2.x, tylko w wersji z bazą: `js/vendor/supabase.js` (z `dist/umd/supabase.js`), w wersji aktualnej w dniu dodania, wpisanej tutaj i w SPEC.md. Zwykły `<script>` przed `app.js`; tworzy globalną zmienną `supabase`, więc klienta nazywaj inaczej: `const client = window.supabase.createClient(…)` (zapis `const supabase = supabase.createClient(…)` w module daje błąd „Cannot access 'supabase' before initialization”). Plik `+esm` z jsDelivr się nie nadaje: importuje kolejne pliki z jsDelivr.
 - Przeglądarka docelowa to przeglądarka na komputerze w pracy, wersja: _uzupełnić po teście w pracy (13.10.2026)_. Nie używaj funkcji JavaScript ani CSS, których ta wersja nie zna (MDN, sekcja „Browser compatibility”). Do czasu wpisania wersji: nic młodszego niż ok. 3 lata (np. `Object.groupBy`).
 - Dane: `localStorage` pod kluczem `organizerNauki`; w wersji z bazą przechodzą do Supabase.
 - Hosting: GitHub Pages pod adresem `https://kubiakraf.github.io/organizer-nauki/`. Plik `.nojekyll` musi zostać w repozytorium.
@@ -69,6 +69,7 @@ js/tests/                 testy logiki (jeszcze nie ma)
 - Oba moduły zapisu mają ten sam, asynchroniczny interfejs (zwracają `Promise`, także wersja lokalna):
   `load()`, `addBlock(block)`, `updateBlock(block)` (np. dopisany opis), `deleteBlock(id)`, `saveTask(task)` (dodaje albo aktualizuje), `replaceAll(data)`, `exportAll()`.
 - Logika liczenia (sumy, cele, zakresy dni) i sprawdzanie importu w `model.js` i `dates.js`, nie w widokach. Funkcje liczące dostają listę bloków jako argument, a nie czytają globalnego stanu.
+- Przerysowanie widoku (po zapisie, o północy, po odświeżeniu danych) nie może skasować wpisywanego tekstu: otwarte pole i wpisany tekst trzymaj w `state`, a nie tylko na stronie.
 - Bez `alert()`, `confirm()` i `prompt()`: potwierdzenia („Usunąć? Tak / Nie”) i komunikaty pokazuj na stronie. Okno przeglądarki blokuje stronę, a narzędzia podglądu Claude Code często nie umieją go kliknąć.
 - Wszystkie ścieżki względne (`./js/app.js`, nie `/js/app.js`), bo strona działa pod podkatalogiem `/organizer-nauki/`.
 
@@ -87,7 +88,8 @@ Pełny model w SPEC.md, sekcja 6.
   - w bazie `snake_case`, w aplikacji `camelCase`; tłumaczy to wyłącznie `storage-supabase.js`. Godzinę z bazy (`07:40:00`) skracaj do `GG:MM`;
   - klucz główny to `(user_id, id)`, a blok wskazuje zadanie przez `(user_id, task_id)`; `upsert` po tych kolumnach;
   - zapytanie zwraca najwyżej 1000 wierszy, więc `load()` pobiera wszystkie bloki stronami (`range`), zawsze z `order` (data, godzina, `id`), a widoki liczą z pełnej listy;
-  - `addBlock` musi wytrzymać ponowienie tego samego bloku (`upsert` z `ignoreDuplicates` albo błąd `23505` jako sukces).
+  - `addBlock` musi wytrzymać ponowienie tego samego bloku (`upsert` z `ignoreDuplicates` albo błąd `23505` jako sukces);
+  - `delete()` zawsze z jawnym warunkiem (np. `.eq("user_id", userId)`): Supabase odrzuca `DELETE` bez warunku, a RLS go nie zastępuje.
 
 ## Zasady projektowe
 
@@ -104,7 +106,7 @@ Z sekcji 3 SPEC.md; obowiązują w każdym widoku:
 ## Bezpieczeństwo
 
 - Tekst wpisany przez użytkownika (nazwy zadań, opisy bloków, dane z importu) wstawiaj przez `textContent`, nigdy przez `innerHTML`.
-- Repozytorium jest publiczne: nie wpisuj do plików prywatnego e-maila ani innych danych osobowych. Kopie danych (`organizer-nauki-*.json`) są w `.gitignore`; nie commituj ich.
+- Repozytorium jest publiczne: nie wpisuj do plików prywatnego e-maila ani innych danych osobowych. Kopie danych i pliki z danymi (`organizer-nauki-*`, `dane-testowe-*`) są w `.gitignore`; nie commituj ich. Pliki pobierane przez aplikację nazywaj tak, żeby pasowały do tych wzorców.
 - Wszystkie strony pod `kubiakraf.github.io` mają wspólny `localStorage`: inny projekt pod tym adresem może odczytać albo skasować dane organizera, a w wersji z bazą odczytać token sesji (SPEC.md, sekcja 7).
 - Żadnych kluczy do usług AI w kodzie strony (tylko w Edge Function, i to po MVP).
 - W wersji z bazą (Supabase):

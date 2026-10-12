@@ -109,11 +109,11 @@ Jeden użytkownik. Głównie przeglądarka na komputerze w pracy (własne konto 
 - „Importuj dane” wczytuje taki plik i po potwierdzeniu na stronie zastępuje obecne dane. Potwierdzenie pokazuje liczbę zadań i bloków oraz datę ostatniego bloku w pliku i w obecnych danych. Gdy w pliku jest mniej bloków, wyraźnie ostrzega, bo najczęstsza pomyłka to stara kopia.
 - Import sprawdza plik tak samo surowo jak baza (sekcja 6.3), więc plik, który przejdzie import lokalnie, przejdzie też import do bazy:
   - każde `id` w formacie UUID i bez powtórzeń;
-  - `domainId` z listy dziedzin, `color` w formacie `#rrggbb`, `dailyGoal` liczba całkowita ≥ 0, `archived` prawda albo fałsz;
+  - `name` niepusty tekst, `domainId` z listy dziedzin, `color` w formacie `#rrggbb`, `dailyGoal` liczba całkowita ≥ 0, `archived` prawda albo fałsz;
   - `date` jako `RRRR-MM-DD` z istniejącą datą, `time` jako `GG:MM`, `minutes` liczba całkowita > 0, `note` tekst;
   - każdy blok wskazuje zadanie z tego samego pliku.
 - Plik, który nie jest kopią organizera albo ma błędne pola, daje komunikat (które pole i dlaczego), a dane zostają bez zmian.
-- Gdy zapisanych danych nie da się wczytać (np. są uszkodzone), komunikat o błędzie ma „Pobierz uszkodzone dane” (surowy tekst do pliku, żeby dało się je odratować) i import kopii. Właśnie wtedy kopia jest najbardziej potrzebna.
+- Gdy zapisanych danych nie da się wczytać (np. są uszkodzone), komunikat o błędzie ma „Pobierz uszkodzone dane” (surowy tekst do pliku, żeby dało się je odratować; nazwa pliku też zaczyna się od `organizer-nauki-`) i import kopii. Właśnie wtedy kopia jest najbardziej potrzebna.
 - Przy 0 blokach na ekranie „Dziś”, obok podpowiedzi, jest link „Masz kopię? Importuj”. Po wyczyszczeniu przeglądarki aplikacja zaczyna od nowa i bez tego linku łatwo to przeoczyć.
 
 **Gotowe, gdy:** eksport, wyczyszczenie danych i import przywracają wszystko; zły plik daje komunikat i niczego nie zmienia; plik z mniejszą liczbą bloków daje ostrzeżenie; przy celowo uszkodzonych danych da się pobrać ich surowy tekst i zaimportować kopię.
@@ -127,7 +127,7 @@ Jeden użytkownik. Głównie przeglądarka na komputerze w pracy (własne konto 
 - Zadania i bloki zapisują się w bazie Supabase, więc na każdym urządzeniu są te same.
 - Podczas zapisu kliknięty kafelek pokazuje, że zapis trwa. Baza odpowiada wolniej niż `localStorage`, a bez tej informacji łatwo kliknąć drugi raz.
 - Gdy zapis się nie uda (np. brak internetu), aplikacja pokazuje komunikat z przyciskiem „Spróbuj ponownie”. Ponowienie nigdy nie tworzy drugiego bloku, także wtedy, gdy pierwszy zapis doszedł do bazy, a zginęła tylko odpowiedź.
-- Po powrocie do karty aplikacja wczytuje dane od nowa, żeby przypięta karta pokazywała też bloki zapisane na innych urządzeniach.
+- Po powrocie do karty aplikacja wczytuje dane od nowa (najwyżej raz na minutę), żeby przypięta karta pokazywała też bloki zapisane na innych urządzeniach. Odświeżenie czeka, dopóki trwa zapis albo otwarte jest pole opisu lub formularz, żeby nie skasować wpisywanego tekstu.
 - Jednorazowe przeniesienie danych z wersji lokalnej: eksport (F7) jeszcze w starej wersji, przed wdrożeniem zapisu w bazie, potem import do bazy. Przedtem próba generalna na koncie testowym.
 
 **Gotowe, gdy:** blok zapisany na komputerze w pracy widać na drugim urządzeniu, bez zalogowania nie da się odczytać żadnych danych, konto testowe nie widzi Twoich danych, a ponowiony zapis daje jeden blok.
@@ -210,7 +210,7 @@ create table tasks (
   user_id     uuid not null default auth.uid() references auth.users on delete restrict,
   id          uuid not null default gen_random_uuid(),
   domain_id   text not null check (domain_id in ('prog', 'eng', 'art')),
-  name        text not null,
+  name        text not null check (btrim(name) <> ''),
   color       text not null check (color ~* '^#[0-9a-f]{6}$'),
   daily_goal  int  not null default 0 check (daily_goal >= 0),
   archived    boolean not null default false,
@@ -232,6 +232,8 @@ create table blocks (
 );
 
 create index blocks_user_date on blocks (user_id, date);
+-- Indeks pod klucz obcy: bez niego Performance Advisor zgłasza „Unindexed foreign keys”.
+create index blocks_user_task on blocks (user_id, task_id);
 
 -- Dostęp przez API tylko dla zalogowanych. Bez logowania: błąd 42501 (permission denied).
 revoke all on tasks, blocks from anon;
@@ -254,13 +256,13 @@ Uwagi techniczne:
 - Cel dnia to suma celów aktywnych zadań: na start 2 + 2 + 0 + 4 + 1 = 9.
 - Rozmiar: ok. 9 bloków dziennie to ok. 3300 bloków rocznie. Dla `localStorage` to ok. 0,5 MB przy limicie ok. 5 MB; dla bazy to drobiazg.
 - **Klucz `(user_id, id)`.** Gdyby `id` było unikalne w całej tabeli, kopii wgranej na konto testowe (próba przed przeniesieniem prawdziwych danych) nie dałoby się potem wgrać na Twoje konto: import skończyłby się błędem `duplicate key` albo RLS.
-- **Usuwanie konta.** `on delete restrict` nie pozwala usunąć w panelu konta, które ma dane. Zapomniane hasło odzyskuje się linkiem z panelu, nigdy przez usunięcie konta. Konto testowe da się usunąć dopiero po usunięciu jego bloków i zadań.
+- **Usuwanie konta.** `on delete restrict` nie pozwala usunąć w panelu konta, które ma dane. Zapomniane hasło odzyskuje się linkiem z panelu („Send password recovery”), nigdy przez usunięcie konta. Wbudowana poczta Supabase wysyła tylko na adresy osób z zespołu organizacji w Supabase, najwyżej ok. 2 maile na godzinę, więc Twoje konto w aplikacji ma adres z tego zespołu. Konto testowe da się usunąć dopiero po usunięciu jego bloków i zadań.
 - **Uprawnienia (`grant`).** Od 30.05.2026 nowe projekty Supabase (od 30.10.2026 wszystkie) nie udostępniają tabel z `public` przez API bez `grant`; bez niego supabase-js dostaje `42501 permission denied for table tasks`. Uprawnienia mają tylko zalogowani (`authenticated`), bo aplikacja i tak wymaga logowania. Zapytanie bez logowania kończy się tym samym błędem i to jest poprawny wynik, a nie usterka.
 - **RLS.** `to authenticated` i `(select auth.uid())` zamiast samego `auth.uid()`, jak zaleca Supabase: baza liczy wtedy `auth.uid()` raz na zapytanie, a nie dla każdego wiersza, i Performance Advisor nie zgłasza ostrzeżeń.
 - **Pobieranie stronami.** Supabase zwraca domyślnie najwyżej 1000 wierszy na zapytanie. `load()` pobiera wszystkie bloki stronami (`range`), zawsze posortowane (`order` po dacie, godzinie i `id`): bez sortowania kolejne strony mogą się nakładać albo gubić wiersze. Widoki liczą wszystko z pełnej listy; przy ok. 3300 blokach rocznie to kilka zapytań. Pobieranie tylko zakresu dat i licznik łączny przez `count` to optymalizacja na później (ROADMAP.md).
 - Postgres zwraca godzinę jako `07:40:00`. `storage-supabase.js` skraca ją do `07:40`.
 - **`addBlock` wytrzymuje ponowienie.** Zapis przez `upsert` z `ignoreDuplicates` (albo błąd `23505` uznany za sukces). Gdy żądanie doszło, a zginęła odpowiedź, „Spróbuj ponownie” wysyła blok o tym samym `id` i nie powstaje ani drugi blok, ani fałszywy komunikat o błędzie.
-- **Import do bazy (`replaceAll`).** Najpierw usunięcie bloków, potem zadań konta (bloki wskazują na zadania), następnie zapis zadań i bloków przez `upsert` po `(user_id, id)`. Gdy import przerwie się w połowie, „Spróbuj ponownie” wgrywa ten sam plik jeszcze raz, bez duplikatów. Dane są w pliku, więc nic nie ginie.
+- **Import do bazy (`replaceAll`).** Najpierw usunięcie bloków, potem zadań konta (bloki wskazują na zadania), następnie zapis zadań i bloków przez `upsert` po `(user_id, id)`. Usuwanie ma jawny warunek, np. `.delete().eq("user_id", userId)`: Supabase odrzuca przez API `DELETE` bez warunku („DELETE requires a WHERE clause”), a reguły RLS tego warunku nie zastępują. Gdy import przerwie się w połowie, „Spróbuj ponownie” wgrywa ten sam plik jeszcze raz, bez duplikatów. Dane są w pliku, więc nic nie ginie.
 
 ## 7. Architektura
 
@@ -274,6 +276,8 @@ kliknięcie ──► app.js ──► storage ──► localStorage (wersja lo
 ```
 
 Cały stan to jeden obiekt w pamięci. Każda zmiana to trzy kroki: zapis przez moduł `storage`, a dopiero po udanym zapisie aktualizacja obiektu i ponowne narysowanie bieżącego widoku. Dzięki tej kolejności ekran nigdy nie pokazuje czegoś, czego nie udało się zapisać. Trzy zakładki w jednym pliku HTML: Dziś, Postęp, Zadania. W wersji z bazą przed nimi ekran logowania.
+
+Przerysowanie widoku (po zapisie, o północy, po odświeżeniu danych) nie może skasować tego, co użytkownik właśnie wpisuje: otwarte pole i wpisany tekst są w stanie aplikacji, a nie tylko na stronie.
 
 Potwierdzenia („Usunąć? Tak / Nie”) i komunikaty są na stronie, a nie w oknach `alert()`, `confirm()` czy `prompt()`. Takie okno blokuje całą stronę, a narzędzia, którymi Claude Code sprawdza podgląd, często nie umieją go kliknąć.
 
@@ -338,7 +342,7 @@ js/tests/                 testy logiki
 | Plik | Skąd (paczka npm) | Jak wczytany |
 |---|---|---|
 | `js/vendor/chart.umd.js` | Chart.js 4.4.1, `dist/chart.umd.js` (ok. 200 KB) | przez `views/progress.js` przy pierwszym otwarciu „Postępu”: dodany `<script>`, czekanie na `load`, potem globalne `Chart`. Ekran „Dziś” na niego nie czeka. Gdy plik się nie wczyta, zakładka pokazuje komunikat, a reszta aplikacji działa. |
-| `js/vendor/supabase.js` | supabase-js, `dist/umd/supabase.js` (ok. 220 KB); wersja aktualna w dniu dodania, wpisana tutaj (7.10.2026: 2.117.3) | zwykły `<script>` przed `app.js`; w kodzie globalne `supabase` (`supabase.createClient`) |
+| `js/vendor/supabase.js` | supabase-js, `dist/umd/supabase.js` (ok. 220 KB); wersja aktualna w dniu dodania, wpisana tutaj (7.10.2026: 2.117.3) | zwykły `<script>` przed `app.js`; plik tworzy globalną zmienną `supabase`. Klienta nazywamy inaczej: `const client = window.supabase.createClient(…)`, bo `const supabase = supabase.createClient(…)` w module kończy się błędem „Cannot access 'supabase' before initialization”. |
 
 Obok każdego pliku leży jego licencja (obie biblioteki mają licencję MIT).
 

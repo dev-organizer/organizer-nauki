@@ -34,9 +34,9 @@ Baza wchodzi po wersji lokalnej, a nie od pierwszego dnia, bo:
 
 Każdy krok ma te same punkty: **Opis** (co powstaje), **Rezultat** (co możesz potem zrobić), **Gotowe, gdy** (warunek ukończenia), **Sprawdzenie** (co kliknąć i co zobaczyć, które testy), **Zależności**, **Ryzyka** (i co z nimi robimy), **Do rozstrzygnięcia** (pytania do decyzji na początku sesji) oraz **Do listy kontrolnej** (co krok dopisuje do listy). Zrobione kroki zostają w krótszej formie. F1–F8 to funkcje opisane w SPEC.md, sekcja 4.
 
-## Lista kontrolna (ok. 2 minuty)
+## Lista kontrolna (2–5 minut)
 
-Jedna lista zamiast warunków rozrzuconych po krokach. Przechodzisz ją na serwerze lokalnym na końcu każdego kroku; w wersji z bazą na koncie testowym. Krok, który dodaje funkcję, dopisuje tu jej 1–2 punkty, tak żeby cała lista mieściła się w 10–12 kliknięciach. Punkty oznaczone krokiem obowiązują od jego ukończenia.
+Jedna lista zamiast warunków rozrzuconych po krokach. Przechodzisz ją na serwerze lokalnym na końcu każdego kroku; w wersji z bazą na koncie testowym. Krok, który dodaje funkcję, dopisuje tu jeden punkt; do wersji 1.1 lista urośnie do ok. 14 punktów i ok. 5 minut. Punkty oznaczone krokiem obowiązują od jego ukończenia.
 
 1. `tests.html`: wszystkie testy przechodzą (od kroku 2b).
 2. Strona się otwiera: kafelki w trzech dziedzinach, suma dnia i licznik łączny widoczne od razu (licznik od kroku 2b).
@@ -66,7 +66,7 @@ Nie blokuje kroków 2b–4b. Sprawdzenie robisz we wtorek w pracy, niezależnie 
 - **Gotowe, gdy:** przy tym kroku zapisane są wynik testu pamięci, nazwa i wersja przeglądarki oraz to, czy otwiera się supabase.com; wersja przeglądarki jest w CLAUDE.md; `test-pamieci.html` jest usunięty.
 - **Zależności:** brak.
 - **Ryzyka i plan B:**
-  - dane nie przetrwały nocy, a supabase.com się otwiera → po kroku 3 (kopia) idą kroki 9–12, a dopiero potem 4a i dalej. Do końca kroku 11b eksport na koniec każdego dnia i import, gdy dane znikną. Lista kontrolna sprawdza wtedy tylko to, co już zbudowane;
+  - dane nie przetrwały nocy, a supabase.com się otwiera → po kroku 3 (kopia) idą kroki 9–12, a dopiero potem 4a i dalej. Do końca kroku 11b eksport na koniec każdego dnia i import, gdy dane znikną. Lista kontrolna sprawdza wtedy tylko to, co już zbudowane. Nie ma też jeszcze wykresu ani danych testowych z kroku 5: w krokach 11b i 12 porównujemy licznik łączny, a konto testowe dostaje kilka bloków klikniętych ręcznie;
   - dane nie przetrwały nocy i supabase.com jest zablokowany → stop i decyzja, co dalej, zanim powstanie kolejny kod;
   - przeglądarka jest stara → mniej nowych funkcji JavaScript w kodzie; pilnuje tego zasada w CLAUDE.md.
 
@@ -92,7 +92,7 @@ Dopisany 11.10.2026, po kroku 2. Testy pozwalają od razu zauważyć, że nowa f
   - Strona `tests.html` z krótką funkcją sprawdzającą (bez bibliotek) i testy funkcji z `model.js` i `dates.js`. Strona pokazuje też strefę czasową przeglądarki, bo testy zmiany czasu coś sprawdzają tylko w strefie ze zmianą czasu (np. `Europe/Warsaw`).
   - Teksty kafelka i sumy dnia („2 / 2 ✓”, „Dziś: 5 z 9 bloków”) przechodzą z `views/today.js` do `model.js`, żeby testy je obejmowały.
   - Licznik łączny według F1: widoczny zawsze, od razu po otwarciu strony, a przy 0 blokach z podpowiedzią. Dziś jest ukryty po każdym otwarciu strony aż do pierwszego kliknięcia (`state.lastBlock` startuje jako `null`), a nie tylko przy pustej historii.
-  - Napis startowy w `index.html`: „Wczytywanie… Jeśli ten napis nie znika, odśwież stronę przez Ctrl+Shift+R.” `app.js` chowa go zaraz po uruchomieniu (dalsze błędy mają własny komunikat). Dziś, gdy `app.js` się nie wczyta, np. gdy po wdrożeniu przeglądarka zmiesza stare i nowe pliki, widać tylko trzy przyciski zakładek, a w przypiętej karcie nikt nie zagląda do F12.
+  - Napis startowy w `index.html`: „Wczytywanie… Jeśli ten napis nie znika, odśwież stronę przez Ctrl+Shift+R.” `app.js` chowa go dopiero na końcu startu (po narysowaniu widoku albo po pokazaniu komunikatu o błędzie wczytania), więc zostaje widoczny przy każdym nieprzewidzianym błędzie startu. Pojawia się z opóźnieniem ok. 2 s (CSS `animation-delay`), żeby nie migał przy każdym otwarciu. Dziś, gdy `app.js` się nie wczyta, np. gdy po wdrożeniu przeglądarka zmiesza stare i nowe pliki, widać tylko trzy przyciski zakładek, a w przypiętej karcie nikt nie zagląda do F12.
 - **Rezultat.** Każda kolejna zmiana od razu pokazuje, czy nie zepsuła czegoś, co już działało, a nieudany start strony mówi, co zrobić.
 - **Gotowe, gdy:** `tests.html` pokazuje, że wszystkie testy przechodzą; celowo zepsuty test pokazuje, który i dlaczego (potem cofamy zmianę); spełniony jest warunek z F1; napis startowy pojawia się tylko wtedy, gdy aplikacja nie wystartowała.
 - **Sprawdzenie:**
@@ -101,7 +101,7 @@ Dopisany 11.10.2026, po kroku 2. Testy pozwalają od razu zauważyć, że nowa f
   3. Testy obejmują co najmniej: odmianę (1 blok, 2 bloki, 5 bloków, 12 bloków, 22 bloki), czas (0 min, 25 min, 2 h 5 min, 130 h), przejście przez koniec miesiąca i roku, zmianę czasu 25.10.2026 i 29.03.2026 (`lastDays` bez powtórzonych i zgubionych dni), godzinę tuż po północy, odrzucenie złych danych i danych z nowszej wersji (`upgradeData`), pominięcie zarchiwizowanych zadań w celu dnia, teksty kafelka (bez celu, przed celem, cel osiągnięty, ponad cel), tekst sumy dnia (cel 0, cel 1: „z 1 bloku”, cel 9).
   4. Na serwerze lokalnym usunięcie klucza `organizerNauki` (F12 → Application → Local Storage) i odświeżenie: „Łącznie: 0 bloków” z podpowiedzią; po kliknięciu kafelka licznik rośnie o 1.
   5. Odświeżenie strony, gdy bloki już są: licznik łączny widoczny od razu, bez klikania.
-  6. Tymczasowa literówka w ścieżce do `app.js` w `index.html`: widać napis o odświeżeniu. Po cofnięciu napis znika zaraz po starcie.
+  6. Tymczasowa literówka w ścieżce do `app.js` w `index.html`: po ok. 2 s widać napis o odświeżeniu. Po cofnięciu literówki napis nie pojawia się wcale.
 - **Zależności:** brak.
 - **Ryzyka:**
   - testy zależne od bieżącej daty dają różne wyniki w różne dni → w testach datę i godzinę zawsze podajemy wprost;
@@ -118,7 +118,7 @@ Przed opisem bloku i dopisywaniem, bo od nich nie zależy, a chroni prawdziwe da
 - **Opis.** F7: „Eksportuj dane” i „Importuj dane” w zakładce „Zadania” (lista zadań dojdzie w kroku 7).
   - Sprawdzanie pliku w `model.js`, z testami. Jest tak samo surowe jak baza z sekcji 6.3 SPEC.md, więc plik, który przejdzie import lokalnie, przejdzie też import do bazy w kroku 11b. Pełna lista warunków jest w F7.
   - Potwierdzenie importu na stronie (nie przez `confirm()`), z liczbą zadań i bloków oraz datą ostatniego bloku w pliku i w obecnych danych. Gdy w pliku jest mniej bloków, wyraźne ostrzeżenie: najczęstsza pomyłka to stara kopia.
-  - Przy uszkodzonych danych komunikat z „Pobierz uszkodzone dane” (surowy tekst do pliku) i z importem kopii.
+  - Przy uszkodzonych danych komunikat z „Pobierz uszkodzone dane” (surowy tekst do pliku, którego nazwa też zaczyna się od `organizer-nauki-`) i z importem kopii.
   - Przy 0 blokach na ekranie „Dziś”, obok podpowiedzi, link „Masz kopię? Importuj”. Po wyczyszczeniu przeglądarki aplikacja po cichu zaczyna od nowa, z nowymi `id` zadań.
 - **Rezultat.** Prawdziwe dane mają kopię poza przeglądarką, a na serwerze lokalnym możesz wczytać dane testowe (potrzebne w krokach 5–6).
 - **Gotowe, gdy:** spełniony jest warunek z F7.
@@ -137,7 +137,7 @@ Przed opisem bloku i dopisywaniem, bo od nich nie zależy, a chroni prawdziwe da
   - przy uszkodzonych danych zakładki się nie rysują (`render()` czeka na dane) → pobranie surowych danych i import w komunikacie o błędzie, poza zakładkami;
   - przeglądarka w pracy może blokować pobieranie plików → sprawdzenie 8;
   - kopia w folderze Pobrane chroni przed wyczyszczeniem przeglądarki, ale nie przed awarią komputera → pełne rozwiązanie to baza (kroki 9–12);
-  - kopia trafi do publicznego repozytorium, a w niej prywatne opisy bloków → `organizer-nauki-*.json` jest w `.gitignore` (od 12.10.2026);
+  - kopia trafi do publicznego repozytorium, a w niej prywatne opisy bloków → pliki `organizer-nauki-*` są w `.gitignore` (od 12.10.2026), z każdym rozszerzeniem;
   - inne strony pod `kubiakraf.github.io` (np. projekty z kursu) mają ten sam `localStorage`, więc mogą odczytać albo skasować dane organizera (w poradnikach często jest `localStorage.clear()`) → pytanie o osobny adres niżej.
 - **Do rozstrzygnięcia:**
   - gdzie dokładnie są pobranie i import przy uszkodzonych danych;
@@ -158,7 +158,7 @@ Przed opisem bloku i dopisywaniem, bo od nich nie zależy, a chroni prawdziwe da
   5. Testy nowych funkcji z `model.js` (np. podpowiedź ostatniego opisu, kolejność listy).
 - **Zależności:** krok 2b.
 - **Ryzyka:**
-  - widok rysuje się od nowa po każdym zapisie, więc pole opisu może zniknąć albo stracić kursor → to, dla którego bloku pole jest otwarte, trzymamy w stanie aplikacji (`state`), a nie tylko na stronie;
+  - widok rysuje się od nowa po każdym zapisie i o północy (`setInterval` w `app.js`), więc pole opisu może zniknąć, stracić kursor albo wpisany tekst → to, dla którego bloku pole jest otwarte, i wpisywany tekst trzymamy w stanie aplikacji (`state`), a nie tylko na stronie;
   - zapis opisu się nie uda → komunikat z „Spróbuj ponownie”, blok zostaje bez opisu;
   - pole opisu nie może blokować następnego kliknięcia kafelka (zasada „jedno kliknięcie”).
 - **Do rozstrzygnięcia:**
@@ -256,13 +256,13 @@ Przed opisem bloku i dopisywaniem, bo od nich nie zależy, a chroni prawdziwe da
   4. Przywrócenie → zadanie wraca na ekran „Dziś”.
   5. Nazwa `<b>test</b>` wyświetla się dosłownie, bez pogrubienia (tekst nie jest traktowany jak HTML).
   6. Odświeżenie strony: zmiany zostają.
-  7. Testy: dodanie i zmiana zadania, cel dnia po archiwizacji, sprawdzanie formularza.
+  7. Testy: dodanie i zmiana zadania, cel dnia po archiwizacji, sprawdzanie formularza (w tym odrzucenie pustej nazwy).
 - **Zależności:** kroki 5 i 6 (archiwum widać na wykresie i w raporcie).
 - **Ryzyka:**
   - usunięcie zadania osierociłoby jego bloki → tylko archiwizacja, bez przycisku „Usuń” (F4);
   - zmiana dziedziny przenosi kafelek do innej grupy, a bloki zostają przy zadaniu, bo `id` się nie zmienia;
   - kolor spoza formatu `#rrggbb` nie przejdzie importu ani bazy → formularz używa `<input type="color">`, który daje dokładnie ten format.
-- **Do rozstrzygnięcia:** zasady formularza (pusta nazwa, cel ujemny albo ułamkowy, powtórzona nazwa); kolor dowolny czy z palety i czy czerwony zostaje tylko dla Frontendu (SPEC.md, sekcja 3).
+- **Do rozstrzygnięcia:** reszta zasad formularza (cel ujemny albo ułamkowy, powtórzona nazwa; pusta nazwa jest odrzucana tak jak w imporcie i w bazie); kolor dowolny czy z palety i czy czerwony zostaje tylko dla Frontendu (SPEC.md, sekcja 3).
 - **Do listy kontrolnej:** „Zadania: zmiana celu zmienia sumę dnia na »Dziś«; potem powrót do starego celu.”
 
 ### Krok 8. Szlif i wersja 1.0 (najwyżej 2 bloki)
@@ -297,10 +297,10 @@ Ten krok to klikanie w panelu Supabase, nie kod. Konto zakładasz sam.
   - Settings → API Keys: klucz `sb_publishable_…` do kodu strony. Starych kluczy `anon` i `service_role` (długie tokeny `eyJ…`) nie używamy, bo Supabase wycofuje je do końca 2026.
   - Dwa konta (Authentication → Users → Add user, z automatycznym potwierdzeniem): Twoje i testowe z adresem w domenie `@example.com`, np. `test@example.com`. Potem wyłączona rejestracja nowych kont.
   - Site URL: `https://kubiakraf.github.io/organizer-nauki/` (albo nowy adres, jeśli zapadła taka decyzja w kroku 3).
-  - Advisors → Security Advisor i Performance Advisor bez ostrzeżeń o tabelach i regułach RLS.
-  - Zapisany sposób odzyskania hasła: hasła są w menedżerze haseł, a gdy hasło zginie, link „Send password recovery” z panelu (Authentication → Users). Co aplikacja robi z tym linkiem, rozstrzyga krok 10. Usunięcie konta nigdy nie jest rozwiązaniem: skasowałoby całą historię, dlatego baza na nie nie pozwala, dopóki konto ma dane (`on delete restrict`).
+  - Advisors → Security Advisor i Performance Advisor bez błędów i ostrzeżeń (poziomy ERROR i WARN). Informacje (INFO) typu „Unused Index” są w świeżym projekcie normalne, bo indeksy nie były jeszcze używane.
+  - Zapisany sposób odzyskania hasła. Hasła są w menedżerze haseł, a gdy hasło do Twojego konta zginie, pomaga link „Send password recovery” z panelu (Authentication → Users). Wbudowana poczta Supabase wysyła tylko na adresy osób z zespołu organizacji (zakładka Team), najwyżej ok. 2 maile na godzinę. Link dojdzie więc tylko wtedy, gdy Twoje konto w aplikacji ma ten sam adres co konto w Supabase albo gdy ten adres dodasz do zespołu; sprawdzamy to w tym kroku. Konto testowe (`@example.com`) maila nie dostanie: gdy jego hasło zginie, usuwasz jego bloki i zadania i zakładasz je od nowa. Co aplikacja robi z linkiem, rozstrzyga krok 10. Usunięcie Twojego konta nigdy nie jest rozwiązaniem: skasowałoby całą historię, dlatego baza na nie nie pozwala, dopóki konto ma dane (`on delete restrict`).
 - **Rezultat.** Baza i konta są gotowe i zabezpieczone, zanim powstanie kod.
-- **Gotowe, gdy:** w Table Editor są tabele `tasks` i `blocks`, obie z włączonym RLS; Security Advisor nie zgłasza tabel bez RLS; są dwa konta, a rejestracja jest wyłączona; adres projektu odpowiada z komputera w pracy; jest klucz `sb_publishable_…`; sposób odzyskania hasła jest zapisany przy tym kroku.
+- **Gotowe, gdy:** w Table Editor są tabele `tasks` i `blocks`, obie z włączonym RLS; Advisory nie zgłaszają błędów ani ostrzeżeń; są dwa konta, a rejestracja jest wyłączona; adres projektu odpowiada z komputera w pracy; jest klucz `sb_publishable_…`; sposób odzyskania hasła jest zapisany przy tym kroku, a adres Twojego konta w aplikacji może dostać mail z panelu.
 - **Sprawdzenie:** Table Editor (oznaczenie RLS przy tabelach), oba Advisory, lista użytkowników, ustawienie rejestracji, strona kluczy, adres `/rest/v1/` otwarty w pracy.
 - **Zależności:** krok 8 (wersja 1.0); w planie B z kroku 0b: krok 3.
 - **Ryzyka:**
@@ -314,6 +314,7 @@ Ten krok to klikanie w panelu Supabase, nie kod. Konto zakładasz sam.
 
 - **Opis.** Część F8: ekran logowania (`views/login.js`), zapamiętana sesja, „Wyloguj” w zakładce „Zadania” obok adresu zalogowanego konta. Dane nadal w `localStorage`.
   - supabase-js w aktualnej wersji (sprawdzonej na npm w dniu kroku; 7.10.2026 była to 2.117.3) jako plik `js/vendor/supabase.js`, z kluczem `sb_publishable_…`. Wersję wpisujemy do SPEC.md i CLAUDE.md.
+  - Plik tworzy globalną zmienną `supabase`, więc klienta nazywamy inaczej: `const client = window.supabase.createClient(…)`. Zapis `const supabase = supabase.createClient(…)` w module kończy się błędem „Cannot access 'supabase' before initialization”.
   - Poza adresem produkcyjnym (serwer lokalny, tunel VS Code) formularz przyjmuje tylko adres `@example.com`. Zasady „lokalnie tylko konto testowe” pilnuje kod, a nie pamięć. Adres produkcyjny jest w kodzie w jednej stałej.
 - **Rezultat.** Aplikacja jest zamknięta dla obcych, zanim trafią do niej dane z bazy.
 - **Gotowe, gdy:** po zalogowaniu widać aplikację, po wylogowaniu ekran logowania, a po odświeżeniu strony sesja zostaje; poza adresem produkcyjnym nie da się zalogować na adres spoza `@example.com`.
@@ -337,10 +338,10 @@ Pracujemy na gałęzi `baza`. GitHub Pages pokazuje gałąź `main`, więc prawd
 
 - **Opis.**
   - `storage-supabase.js` z tym samym interfejsem co `storage-local.js` (SPEC.md, sekcja 7) i przełączenie na niego aplikacji.
-  - Tłumaczenie `snake_case` ↔ `camelCase` i godziny `07:40:00` → `07:40`; bloki pobierane stronami, zawsze posortowane (data, godzina, `id`); `replaceAll` według sekcji 6.3 SPEC.md.
+  - Tłumaczenie `snake_case` ↔ `camelCase` i godziny `07:40:00` → `07:40`; bloki pobierane stronami, zawsze posortowane (data, godzina, `id`); `replaceAll` według sekcji 6.3 SPEC.md. Usuwanie w `replaceAll` ma jawny warunek, np. `.delete().eq("user_id", userId)`: Supabase odrzuca przez API `DELETE` bez warunku („DELETE requires a WHERE clause”), a reguły RLS tego warunku nie zastępują.
   - `addBlock` odporny na ponowienie: gdy żądanie doszło, a odpowiedź zginęła, „Spróbuj ponownie” wysyła blok o tym samym `id`. Upsert z `ignoreDuplicates` (albo błąd `23505` uznany za sukces) daje wtedy jeden blok i żadnego fałszywego błędu.
   - Kafelek pokazuje, że zapis trwa (np. „Zapisuję…”); podwójne kliknięcie według decyzji z kroku 4a.
-  - Po powrocie do karty (zdarzenie `visibilitychange`) dane wczytują się od nowa. Przypięta karta jest otwarta całymi dniami, a bez tego nie pokaże bloków z innych urządzeń.
+  - Po powrocie do karty (zdarzenie `visibilitychange`) dane wczytują się od nowa, najwyżej raz na minutę. Przypięta karta jest otwarta całymi dniami, a bez tego nie pokaże bloków z innych urządzeń. Odświeżenie czeka, dopóki trwa zapis albo otwarte jest pole opisu lub formularz („Dopisz blok”, potwierdzenie importu), żeby przerysowanie nie skasowało tego, co wpisujesz.
 - **Rezultat.** Aplikacja zapisuje w bazie; na razie sprawdzana tylko na koncie testowym.
 - **Gotowe, gdy:** na serwerze lokalnym, na koncie testowym, przechodzi cała lista kontrolna, a ponowiony zapis bloku daje jeden blok.
 - **Sprawdzenie:**
@@ -348,13 +349,13 @@ Pracujemy na gałęzi `baza`. GitHub Pages pokazuje gałąź `main`, więc prawd
   2. F12 → Network → Offline → kliknięcie kafelka → komunikat z „Spróbuj ponownie” → Online → ponowienie → jeden blok, nie dwa.
   3. Ten sam blok zapisany dwa razy (tymczasowe podwójne wywołanie `storage.addBlock(block)`, potem cofnięte) → jeden wiersz w bazie, bez komunikatu o błędzie. Sprawdzenie 2 tego nie złapie, bo w trybie Offline żądanie w ogóle nie wychodzi.
   4. F12 → Network → Slow 3G: kafelek pokazuje, że zapis trwa.
-  5. Dwie karty na koncie testowym: blok zapisany w jednej → powrót do drugiej → blok widoczny bez odświeżania.
+  5. Dwie karty na koncie testowym: blok zapisany w jednej → powrót do drugiej → blok widoczny bez odświeżania. Gdy w drugiej karcie jest otwarte pole opisu z wpisanym tekstem, powrót do niej tekstu nie kasuje.
   6. Testy tłumaczenia wierszy, bez łączenia z bazą.
 - **Zależności:** kroki 9 i 10.
 - **Ryzyka:**
   - od tego kroku serwer lokalny i GitHub Pages używają tej samej bazy → lokalnie tylko konto testowe (pilnuje tego kod z kroku 10);
   - baza odpowiada wolniej niż `localStorage` → widoczny stan zapisu, żeby nie kliknąć drugi raz;
-  - odświeżenie po powrocie do karty w trakcie zapisu mogłoby nadpisać stan → wczytujemy dane od nowa dopiero wtedy, gdy żaden zapis nie trwa;
+  - odświeżenie po powrocie do karty w trakcie zapisu albo pisania nadpisałoby stan lub wpisany tekst → wczytujemy dane od nowa dopiero wtedy, gdy nie trwa zapis i nie jest otwarte żadne pole;
   - sesja wygasła → ekran logowania zamiast „Spróbuj ponownie” bez końca.
 - **Do rozstrzygnięcia:** gdzie trzymać tłumaczenie wierszy, żeby testy działały bez łączenia z bazą.
 - **Do listy kontrolnej:** „F12 → Network → Offline → kliknięcie kafelka → komunikat → Online → Spróbuj ponownie → jeden blok.”
@@ -367,15 +368,16 @@ Osobna sesja, w jednym ciągu i bez klikania bloków w trakcie.
 - **Rezultat.** Te same dane na każdym urządzeniu.
 - **Gotowe, gdy:** spełniony jest warunek z F8, a cała historia z wersji lokalnej jest w bazie (licznik łączny taki sam jak przed przeniesieniem).
 - **Sprawdzenie (w tej kolejności):**
-  1. Na GitHub Pages (jeszcze stara wersja): eksport → plik kopii. Eksport to nie klikanie kafelków, więc na produkcji wolno.
-  2. Próba generalna: na serwerze lokalnym, na koncie testowym, import tego pliku → licznik łączny i wykres jak na GitHub Pages. Klucz `(user_id, id)` w bazie pozwala potem wgrać ten sam plik na drugie konto.
-  3. Scalenie gałęzi `baza` z `main` i push → ok. 2 minuty → Ctrl+Shift+R na GitHub Pages.
-  4. Logowanie na Twoje konto → import tego samego pliku → licznik łączny i wykres jak przed przeniesieniem. Jeśli między punktem 1 a 4 przybyły bloki, eksport jeszcze raz.
-  5. Na koncie testowym import danych testowych (krok 5) w miejsce kopii prawdziwych. Inaczej test w kroku 12 nie odróżni Twoich danych od testowych.
-  6. Drugie urządzenie: po zalogowaniu widać blok zapisany na komputerze w pracy.
+  1. Na GitHub Pages (jeszcze stara wersja): eksport → plik do próby generalnej. Eksport to nie klikanie kafelków, więc na produkcji wolno.
+  2. Próba generalna: na serwerze lokalnym, na koncie testowym, import tego pliku → licznik łączny i wykres jak na GitHub Pages. Klucz `(user_id, id)` w bazie pozwala potem wgrać te same dane na drugie konto.
+  3. Tuż przed scaleniem, na GitHub Pages: eksport jeszcze raz → świeży plik do przeniesienia. Od tej chwili bez klikania bloków aż do punktu 5. Po scaleniu eksport czyta już z bazy, więc później świeżego pliku z wersji lokalnej nie da się zrobić.
+  4. Scalenie gałęzi `baza` z `main` i push → ok. 2 minuty → Ctrl+Shift+R na GitHub Pages.
+  5. Logowanie na Twoje konto → import świeżego pliku z punktu 3 → licznik łączny i wykres jak przed przeniesieniem.
+  6. Na koncie testowym import danych testowych (krok 5) w miejsce kopii prawdziwych. Inaczej test w kroku 12 nie odróżni Twoich danych od testowych.
+  7. Drugie urządzenie: po zalogowaniu widać blok zapisany na komputerze w pracy.
 - **Zależności:** krok 11a; kopia zapasowa (krok 3).
 - **Ryzyka:**
-  - po wdrożeniu eksport czyta już z bazy → eksport przed scaleniem (punkt 1); stare dane i tak zostają w `localStorage`, więc w razie kłopotu da się je odzyskać przez F12;
+  - po wdrożeniu eksport czyta już z bazy → świeży eksport tuż przed scaleniem (punkt 3); stare dane i tak zostają w `localStorage`, więc w razie kłopotu da się je odzyskać przez F12;
   - import przerwany w połowie → „Spróbuj ponownie” wgrywa ten sam plik jeszcze raz (SPEC.md, sekcja 6.3);
   - bloki z innej przeglądarki (np. z domu) nie przejdą, bo przeniesienie bierze jeden plik → wcześniej dopisane w pracy przez „Dopisz blok”;
   - baza to nie kopia zapasowa (na darmowym planie nie licz na kopie z panelu Supabase) → eksport raz w tygodniu zostaje.
@@ -388,9 +390,9 @@ Osobna sesja, w jednym ciągu i bez klikania bloków w trakcie.
   1. to samo zapytanie o `tasks` i `blocks` z kluczem publicznym: po zalogowaniu na Twoje konto zwraca Twoje dane, na koncie testowym tylko dane testowe, a bez logowania kończy się błędem `42501 permission denied`. Ten błąd to dobry wynik: tabele są dostępne tylko dla zalogowanych (SPEC.md, sekcja 6.3);
   2. próba założenia nowego konta kończy się błędem;
   3. próba usunięcia konta testowego, które ma dane (panel → Authentication → Users), kończy się błędem;
-  4. w plikach i w historii gita jedyny klucz to `sb_publishable_…`: nie ma `sb_secret_…` ani tokenów `eyJ…`;
+  4. w plikach i w historii gita jedyny prawdziwy klucz to `sb_publishable_…`: nie ma klucza `sb_secret_…` ani tokenów `eyJ…`. Szukamy prawdziwych kluczy, czyli prefiksu z długim ciągiem znaków za nim (np. `sb_secret_[A-Za-z0-9_-]{20,}`, `eyJ[A-Za-z0-9_-]{20,}`). Same teksty `sb_secret_`, `sb_publishable_` i `sb_temp_` są w `js/vendor/supabase.js`, bo biblioteka rozpoznaje rodzaje kluczy; to nie są klucze;
   5. tag `v1.1` jest wypchnięty.
-- **Sprawdzenie:** prompt: „Przygotuj zapytania do sprawdzenia RLS według kroku 12 i wykonaj wersję bez logowania. Znajdź w plikach i w historii gita wszystkie klucze (`sb_…`, `eyJ…`) i sprawdź, że to wyłącznie `sb_publishable_…`.” Zapytania po zalogowaniu, próbę rejestracji i próbę usunięcia konta wykonujesz sam, bo wymagają hasła albo panelu.
+- **Sprawdzenie:** prompt: „Przygotuj zapytania do sprawdzenia RLS według kroku 12 i wykonaj wersję bez logowania. Znajdź w plikach i w historii gita wszystkie prawdziwe klucze (prefiks `sb_` albo `eyJ` z co najmniej 20 znakami za nim) i sprawdź, że to wyłącznie `sb_publishable_…`.” Zapytania po zalogowaniu, próbę rejestracji i próbę usunięcia konta wykonujesz sam, bo wymagają hasła albo panelu.
 - **Zależności:** krok 11b (pusta tabela niczego nie dowodzi).
 - **Ryzyka:**
   - błąd albo pusta odpowiedź mogą znaczyć pomyłkę w zapytaniu, a nie działające zabezpieczenie → dlatego najpierw zapytanie po zalogowaniu musi zwrócić dane;
