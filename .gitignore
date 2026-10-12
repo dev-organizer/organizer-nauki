@@ -1,2 +1,6 @@
 # Lokalne ustawienia Claude Code (np. launch.json z portem tego komputera)
 .claude/
+
+# Kopie danych i dane testowe: repozytorium jest publiczne, a w kopii są prywatne opisy bloków
+organizer-nauki-*.json
+dane-testowe-*.json

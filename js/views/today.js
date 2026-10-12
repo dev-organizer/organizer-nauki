@@ -1,5 +1,5 @@
 // Ekran „Dziś”: suma dnia, licznik łączny i kafelki zadań.
-// Opis bloku, lista dnia i usuwanie dochodzą w kroku 3a, dopisywanie po fakcie w 3b.
+// Opis bloku (F2) oraz lista dnia, usuwanie i dopisywanie po fakcie (F3) dochodzą później.
 //
 // Elementy tworzymy przez createElement i textContent, a nie przez innerHTML:
 // nazwa zadania wpisana przez użytkownika nigdy nie zostanie potraktowana jak kod HTML.

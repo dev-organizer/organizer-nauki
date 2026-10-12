@@ -3,7 +3,7 @@
 // Każda zmiana danych to trzy kroki: zapis przez moduł storage, a dopiero
 // po udanym zapisie aktualizacja stanu i ponowne narysowanie bieżącego widoku.
 
-// Moduł zapisu. W kroku 11 podmieniamy tu import na storage-supabase.js.
+// Moduł zapisu. W wersji z bazą podmieniamy tu import na storage-supabase.js.
 import * as storage from "./storage-local.js";
 import { createBlock } from "./model.js";
 import { todayString } from "./dates.js";

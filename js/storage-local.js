@@ -1,4 +1,4 @@
-// Zapis danych w localStorage przeglądarki (kroki 1–10).
+// Zapis danych w localStorage przeglądarki (wersja lokalna).
 //
 // Wszystkie funkcje są asynchroniczne (zwracają Promise), tak samo jak
 // przyszły storage-supabase.js. Dzięki temu przejście na bazę to
