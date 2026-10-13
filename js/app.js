@@ -22,7 +22,6 @@ const VIEWS = {
 const state = {
   data: null,       // { version, tasks, blocks } z modułu zapisu
   tab: "today",     // bieżąca zakładka
-  lastBlock: null,  // ostatni blok zapisany od otwarcia strony
 };
 
 // Operacje na danych, które widoki mogą wywołać.
@@ -123,18 +122,23 @@ async function saveBlock(block) {
     return;
   }
   state.data.blocks.push(block);
-  state.lastBlock = block;
   render();
 }
+
+// Napis „Wczytywanie…” z index.html. Chowamy go dopiero na samym końcu startu:
+// jeśli start przerwie nieprzewidziany błąd, napis zostaje i mówi, co zrobić.
+const loadingNotice = document.getElementById("loading");
 
 async function start() {
   try {
     state.data = await storage.load();
   } catch (error) {
     showError(`Nie udało się wczytać danych. ${error.message}`, start);
+    loadingNotice.hidden = true;
     return;
   }
   render();
+  loadingNotice.hidden = true;
 }
 
 start();

@@ -23,7 +23,7 @@ Jeden użytkownik. Głównie przeglądarka na komputerze w pracy (własne konto 
 1. Kostka-minutnik odlicza 25 minut. Minutnik jest poza aplikacją.
 2. Kliknięcie kafelka zadania, np. „Python”, zapisuje blok 25 minut z bieżącą godziną.
 3. Opcjonalnie: wpisanie, co konkretnie było robione (Enter), albo pominięcie (Esc).
-4. Kafelek pokazuje np. „2 / 2 ✓”, a licznik łączny rośnie o 1. Od razu widać, które zadania są jeszcze przed celem.
+4. Kafelek pokazuje np. „2 / 2”, 100% i zielony ✓, a licznik łączny rośnie o 1. Od razu widać, które zadania są jeszcze przed celem.
 5. Na koniec dnia lub tygodnia: zakładka „Postęp” z wykresem i przycisk „Kopiuj raport” do wklejenia w projekt w Claude.
 
 **Wersja lokalna to jedna przeglądarka.** Dane są tylko w przeglądarce, w której klikasz (w pracy). Bloki zrobione gdzie indziej dopisujesz tam przez „Dopisz blok” (F3). Do bazy przenosi się jeden plik kopii, bez łączenia kilku.
@@ -45,12 +45,12 @@ Jeden użytkownik. Głównie przeglądarka na komputerze w pracy (własne konto 
 ### F1. Ekran „Dziś”
 
 - Kafelki zadań pogrupowane w dziedziny: Programowanie, Angielski, ART. Każdy kafelek ma kolor swojego zadania.
-- Na kafelku: nazwa i „zrobione / cel”, np. „1 / 2”. Po osiągnięciu celu pojawia się ✓. Zadanie z celem 0 pokazuje samą liczbę bloków.
+- Na kafelku po lewej nazwa i „zrobione / cel”, np. „1 / 2”. Po prawej, na wysokości nazwy, procent celu zaokrąglony do całości: 0%, 25%, 100%, a ponad cel 125%, 150% itd. Po osiągnięciu celu pod procentem pojawia się zielony ✓. Zadanie z celem 0 pokazuje samą liczbę bloków, bez procentu i ✓.
 - Kliknięcie kafelka zapisuje blok 25 minut z bieżącą datą i godziną.
-- Nad kafelkami suma dnia, np. „Dziś: 5 z 9 bloków · 2 h 5 min”.
+- Nad kafelkami suma dnia, np. „Dziś: 9 bloków · 3 h 45 min · cele: 7 z 10”: najpierw wszystkie dzisiejsze bloki, potem postęp względem celu dnia. Do celu każde zadanie liczy się najwyżej do swojego celu (Claude Code 3 / 1 daje 1), więc nadmiar w jednym zadaniu nie zasłania braków w innym. Po osiągnięciu wszystkich celów pojawia się ✓ („cele: 10 z 10 ✓”). Gdy żadne zadanie nie ma celu, części „cele” nie ma.
 - Licznik wszystkich bloków od początku, np. „Łącznie: 312 bloków · 130 h”, widoczny zawsze, od razu po otwarciu strony. Przy 0 blokach pokazuje „Łącznie: 0 bloków” i podpowiedź „Tu będzie widać Twój postęp”.
 
-**Gotowe, gdy:** dwa kliknięcia w „Python” dają „2 / 2 ✓”, po każdym kliknięciu licznik łączny rośnie o 1, a po odświeżeniu strony stan zostaje. Przy danych bez bloków licznik pokazuje 0 z podpowiedzią.
+**Gotowe, gdy:** dwa kliknięcia w „Python” dają „2 / 2”, 100% i zielony ✓, po każdym kliknięciu licznik łączny rośnie o 1, a po odświeżeniu strony stan zostaje. Przy danych bez bloków licznik pokazuje 0 z podpowiedzią.
 
 ### F2. Opis bloku (opcjonalny)
 
@@ -82,7 +82,7 @@ Jeden użytkownik. Głównie przeglądarka na komputerze w pracy (własne konto 
 **Gotowe, gdy:**
 
 - nowe zadanie „Kolaże GIMP” w dziedzinie ART pojawia się na ekranie „Dziś” w wybranym kolorze;
-- zmiana celu zmienia sumę dnia, np. z „z 9” na „z 10”;
+- zmiana celu zmienia sumę dnia, np. z „cele: 7 z 10” na „cele: 7 z 11”;
 - zarchiwizowane zadanie znika z ekranu „Dziś”, a jego bloki zostają w liczniku łącznym, na wykresie i w raporcie; przywrócone wraca na ekran „Dziś”.
 
 ### F5. Postęp (wykres)
@@ -169,7 +169,7 @@ Wszystkie dane to jeden obiekt JSON zapisany w `localStorage` pod kluczem `organ
   "tasks": [
     { "id": "…", "domainId": "prog", "name": "Python",      "color": "#1e88e5", "dailyGoal": 2, "archived": false },
     { "id": "…", "domainId": "prog", "name": "Frontend",    "color": "#e53935", "dailyGoal": 2, "archived": false },
-    { "id": "…", "domainId": "prog", "name": "Claude Code", "color": "#fb8c00", "dailyGoal": 0, "archived": false },
+    { "id": "…", "domainId": "prog", "name": "Claude Code", "color": "#fb8c00", "dailyGoal": 1, "archived": false },
     { "id": "…", "domainId": "eng",  "name": "Angielski",   "color": "#8e24aa", "dailyGoal": 4, "archived": false },
     { "id": "…", "domainId": "art",  "name": "Rysunek",     "color": "#43a047", "dailyGoal": 1, "archived": false }
   ],
@@ -253,7 +253,7 @@ create policy "tylko własne bloki" on blocks for all to authenticated
 Uwagi techniczne:
 
 - Datę liczyć lokalnie. `toISOString()` zwraca czas UTC, więc blok zapisany tuż po północy trafiłby na poprzedni dzień.
-- Cel dnia to suma celów aktywnych zadań: na start 2 + 2 + 0 + 4 + 1 = 9.
+- Cel dnia to suma celów aktywnych zadań: na start 2 + 2 + 1 + 4 + 1 = 10.
 - Rozmiar: ok. 9 bloków dziennie to ok. 3300 bloków rocznie. Dla `localStorage` to ok. 0,5 MB przy limicie ok. 5 MB; dla bazy to drobiazg.
 - **Klucz `(user_id, id)`.** Gdyby `id` było unikalne w całej tabeli, kopii wgranej na konto testowe (próba przed przeniesieniem prawdziwych danych) nie dałoby się potem wgrać na Twoje konto: import skończyłby się błędem `duplicate key` albo RLS.
 - **Usuwanie konta.** `on delete restrict` nie pozwala usunąć w panelu konta, które ma dane. Zapomniane hasło odzyskuje się linkiem z panelu („Send password recovery”), nigdy przez usunięcie konta. Wbudowana poczta Supabase wysyła tylko na adresy osób z zespołu organizacji w Supabase, najwyżej ok. 2 maile na godzinę, więc Twoje konto w aplikacji ma adres z tego zespołu. Konto testowe da się usunąć dopiero po usunięciu jego bloków i zadań.

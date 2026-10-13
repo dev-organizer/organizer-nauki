@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="pl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Testy · Organizer nauki</title>
+  <link rel="stylesheet" href="./css/style.css">
+  <style>
+    h1 {
+      margin: 0 0 0.5rem;
+      font-size: 1.5rem;
+    }
+
+    .summary {
+      font-size: 1.25rem;
+      font-weight: 600;
+    }
+
+    #time-zone {
+      color: var(--text-muted);
+    }
+
+    #results h2 {
+      margin: 1.25rem 0 0.25rem;
+      font-size: 1rem;
+    }
+
+    #results ul {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    #results li {
+      margin: 0.15rem 0;
+    }
+
+    /* Nieudany test: ✗ i ciemne tło, jak komunikat o błędzie w aplikacji.
+       Nigdy na czerwono: czerwony to kolor zadania Frontend. */
+    .failed {
+      padding: 0.25rem 0.5rem;
+      border-radius: 0.375rem;
+      background: var(--notice-background);
+      color: var(--notice-text);
+    }
+  </style>
+  <script type="module" src="./js/tests/run.js"></script>
+</head>
+<body>
+  <main>
+    <h1>Testy organizera nauki</h1>
+    <!-- run.js podmienia ten napis na wynik. Jeśli zostaje, testy się nie uruchomiły. -->
+    <p id="summary" class="summary">Testy się uruchamiają… Jeśli ten napis nie znika, zajrzyj do konsoli (F12).</p>
+    <p id="time-zone"></p>
+    <div id="results"></div>
+  </main>
+</body>
+</html>

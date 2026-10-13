@@ -9,6 +9,9 @@
   /* Błędy nigdy na czerwono: czerwony to kolor zadania Frontend. */
   --notice-background: #37474f;
   --notice-text: #ffffff;
+  /* Zielony ✓ przy osiągniętym celu. Ciemniejszy niż zielony Rysunku,
+     żeby był dobrze widoczny na tle każdego kafelka. */
+  --done: #1e6b24;
 }
 
 * {
@@ -103,6 +106,20 @@ main {
   padding: 1rem 1rem 6rem;
 }
 
+/* Napis startowy. Niewidoczny przez pierwsze 2 s, żeby nie migał przy każdym otwarciu;
+   app.js chowa go na końcu startu, więc zostaje tylko wtedy, gdy start się nie udał. */
+
+#loading {
+  visibility: hidden;
+  animation: show-loading 0s 2s forwards;
+}
+
+@keyframes show-loading {
+  to {
+    visibility: visible;
+  }
+}
+
 /* Ekran „Dziś”: suma dnia i licznik łączny */
 
 .today-header {
@@ -121,13 +138,15 @@ main {
 }
 
 .total {
-  margin: 0;
   color: var(--text-muted);
 }
 
-/* Do pierwszego zapisu licznik jest niewidoczny, ale zajmuje swoje miejsce. */
-.total-waiting {
-  visibility: hidden;
+.total p {
+  margin: 0;
+}
+
+.total-hint {
+  font-size: 0.875rem;
 }
 
 /* Dziedziny i kafelki */
@@ -143,16 +162,19 @@ main {
 
 .tiles {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(10rem, 1fr));
+  /* 11rem: nazwa „Claude Code” i procent „100%” mieszczą się w jednej linijce. */
+  grid-template-columns: repeat(auto-fill, minmax(11rem, 1fr));
   gap: 0.75rem;
 }
 
 .tile {
   --task-color: #888888; /* zastępowany kolorem zadania w today.js */
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 0.5rem;
+  /* Dwie kolumny: po lewej nazwa i liczba bloków, po prawej procent celu i ✓. */
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: baseline;
+  align-content: start;
+  gap: 0.5rem 0.75rem;
   min-height: 5.5rem;
   padding: 0.75rem 1rem;
   text-align: left;
@@ -191,4 +213,20 @@ main {
   font-size: 1.5rem;
   font-weight: 600;
   font-variant-numeric: tabular-nums;
+}
+
+.tile-percent,
+.tile-check {
+  justify-self: end;
+}
+
+.tile-percent {
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.tile-check {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--done);
 }

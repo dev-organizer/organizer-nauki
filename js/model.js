@@ -1,7 +1,7 @@
 // Dziedziny, format danych, tworzenie zadań i bloków oraz zliczenia.
 // Ten plik nie zapisuje niczego sam: zapisem zajmuje się moduł storage.
 
-import { todayString, currentTime } from "./dates.js";
+import { todayString, currentTime, formatDuration } from "./dates.js";
 
 // Dziedziny są stałe i zapisane w kodzie, a nie w danych.
 export const DOMAINS = [
@@ -21,7 +21,7 @@ export const BLOCK_MINUTES = 25;
 const START_TASKS = [
   { domainId: "prog", name: "Python",      color: "#1e88e5", dailyGoal: 2 },
   { domainId: "prog", name: "Frontend",    color: "#e53935", dailyGoal: 2 },
-  { domainId: "prog", name: "Claude Code", color: "#fb8c00", dailyGoal: 0 },
+  { domainId: "prog", name: "Claude Code", color: "#fb8c00", dailyGoal: 1 },
   { domainId: "eng",  name: "Angielski",   color: "#8e24aa", dailyGoal: 4 },
   { domainId: "art",  name: "Rysunek",     color: "#43a047", dailyGoal: 1 },
 ];
@@ -89,9 +89,19 @@ export function countBlocks(blocks, taskId) {
   return blocks.filter((block) => block.taskId === taskId).length;
 }
 
-// Cel dnia: suma celów aktywnych zadań (na start 2 + 2 + 0 + 4 + 1 = 9).
+// Cel dnia: suma celów aktywnych zadań (na start 2 + 2 + 1 + 4 + 1 = 10).
 export function dailyGoalTotal(tasks) {
   return activeTasks(tasks).reduce((sum, task) => sum + task.dailyGoal, 0);
+}
+
+// Bloki, które liczą się do celu dnia: każde aktywne zadanie najwyżej do swojego celu.
+// Python 4 / 2 daje 2, zadanie bez celu daje 0, więc nadmiar w jednym zadaniu
+// nie zasłania braków w innym.
+export function blocksTowardGoals(tasks, blocks) {
+  return activeTasks(tasks).reduce(
+    (sum, task) => sum + Math.min(countBlocks(blocks, task.id), task.dailyGoal),
+    0,
+  );
 }
 
 // Łączny czas bloków w minutach.
@@ -117,4 +127,44 @@ export function formatBlocks(count) {
     return `${count} bloki`;
   }
   return `${count} bloków`;
+}
+
+// Tekst na kafelku: „1 / 2”, także ponad cel: „4 / 2”. Zadanie bez celu pokazuje
+// samą liczbę bloków. Procent celu i ✓ są na kafelku osobno, po prawej.
+export function tileCountText(done, dailyGoal) {
+  if (dailyGoal === 0) {
+    return String(done);
+  }
+  return `${done} / ${dailyGoal}`;
+}
+
+// Procent celu zadania: 1 / 4 → „25%”, 2 / 2 → „100%”, 3 / 2 → „150%”.
+// Zaokrąglamy do całości: 1 / 3 → „33%”. Zadanie bez celu nie ma procentu: "".
+export function goalPercentText(done, dailyGoal) {
+  if (dailyGoal === 0) {
+    return "";
+  }
+  return `${Math.round((done / dailyGoal) * 100)}%`;
+}
+
+// Suma dnia: najpierw wszystkie bloki z tego dnia, potem postęp względem celu dnia,
+// np. „Dziś: 9 bloków · 3 h 45 min · cele: 7 z 10”. Po osiągnięciu wszystkich celów
+// „cele: 10 z 10 ✓”. Gdy żadne aktywne zadanie nie ma celu, części „cele” nie ma.
+export function daySummaryText(tasks, dayBlocks) {
+  const summary = `Dziś: ${formatBlocks(dayBlocks.length)} · ${formatDuration(totalMinutes(dayBlocks))}`;
+  const goal = dailyGoalTotal(tasks);
+  if (goal === 0) {
+    return summary;
+  }
+  const done = blocksTowardGoals(tasks, dayBlocks);
+  const mark = isGoalReached(done, goal) ? " ✓" : "";
+  return `${summary} · cele: ${done} z ${goal}${mark}`;
+}
+
+// Licznik łączny: „Łącznie: 312 bloków · 130 h”. Przy 0 blokach bez czasu: „Łącznie: 0 bloków”.
+export function totalText(blocks) {
+  if (blocks.length === 0) {
+    return "Łącznie: 0 bloków";
+  }
+  return `Łącznie: ${formatBlocks(blocks.length)} · ${formatDuration(totalMinutes(blocks))}`;
 }

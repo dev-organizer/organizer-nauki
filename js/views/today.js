@@ -10,19 +10,20 @@ import {
   tasksInDomain,
   blocksOnDate,
   countBlocks,
-  dailyGoalTotal,
-  totalMinutes,
   isGoalReached,
-  formatBlocks,
+  tileCountText,
+  goalPercentText,
+  daySummaryText,
+  totalText,
 } from "../model.js";
-import { todayString, formatDuration } from "../dates.js";
+import { todayString } from "../dates.js";
 
 export function render(container, state, actions) {
   const todayBlocks = blocksOnDate(state.data.blocks, todayString());
 
   const header = document.createElement("div");
   header.className = "today-header";
-  header.append(renderDaySummary(state.data.tasks, todayBlocks), renderTotal(state));
+  header.append(renderDaySummary(state.data.tasks, todayBlocks), renderTotal(state.data.blocks));
 
   container.replaceChildren(header);
 
@@ -35,37 +36,31 @@ export function render(container, state, actions) {
   }
 }
 
-// „Dziś: 5 z 9 bloków · 2 h 5 min”. Bez żadnego celu: „Dziś: 5 bloków · 2 h 5 min”.
+// „Dziś: 9 bloków · 3 h 45 min · cele: 7 z 10”. Tekst składa model.js.
 function renderDaySummary(tasks, todayBlocks) {
-  const done = todayBlocks.length;
-  const goal = dailyGoalTotal(tasks);
-  const time = formatDuration(totalMinutes(todayBlocks));
-
   const summary = document.createElement("p");
   summary.className = "day-summary";
-  if (goal === 0) {
-    summary.textContent = `Dziś: ${formatBlocks(done)} · ${time}`;
-  } else {
-    // Po „z” odmiana jest inna niż zwykle: „z 1 bloku”, „z 9 bloków”.
-    const unit = goal === 1 ? "bloku" : "bloków";
-    summary.textContent = `Dziś: ${done} z ${goal} ${unit} · ${time}`;
-  }
+  summary.textContent = daySummaryText(tasks, todayBlocks);
   return summary;
 }
 
-// „Łącznie: 312 bloków · 130 h”: wszystkie bloki od początku.
-// Pojawia się po zapisaniu bloku. Do tego czasu jego miejsce jest puste,
-// ale zarezerwowane, żeby kafelki nie przeskoczyły w dół pod kursorem.
-function renderTotal(state) {
-  const blocks = state.data.blocks;
+// „Łącznie: 312 bloków · 130 h”: wszystkie bloki od początku, widoczne od razu
+// po otwarciu strony. Przy 0 blokach z podpowiedzią pod spodem.
+function renderTotal(blocks) {
+  const box = document.createElement("div");
+  box.className = "total";
 
   const total = document.createElement("p");
-  total.className = "total";
-  total.textContent = `Łącznie: ${formatBlocks(blocks.length)} · ${formatDuration(totalMinutes(blocks))}`;
-  if (state.lastBlock === null) {
-    total.classList.add("total-waiting");
+  total.textContent = totalText(blocks);
+  box.append(total);
+
+  if (blocks.length === 0) {
+    const hint = document.createElement("p");
+    hint.className = "total-hint";
+    hint.textContent = "Tu będzie widać Twój postęp";
+    box.append(hint);
   }
-  return total;
+  return box;
 }
 
 // Jedna dziedzina: nagłówek i kafelki jej zadań.
@@ -87,15 +82,17 @@ function renderDomain(domain, tasks, todayBlocks, actions) {
 }
 
 // Kafelek zadania. Jedno kliknięcie zapisuje blok 25 minut.
+// Po lewej nazwa i „zrobione / cel”, po prawej procent celu i zielony ✓ po osiągnięciu celu.
 function renderTile(task, todayBlocks, actions) {
   const done = countBlocks(todayBlocks, task.id);
+  const goalReached = isGoalReached(done, task.dailyGoal);
 
   const tile = document.createElement("button");
   tile.type = "button";
   tile.className = "tile";
   // Kolor zadania trafia do zmiennej CSS, a style.css robi z niego tło i pasek.
   tile.style.setProperty("--task-color", task.color);
-  if (isGoalReached(done, task.dailyGoal)) {
+  if (goalReached) {
     tile.classList.add("tile-goal-reached");
   }
 
@@ -103,23 +100,21 @@ function renderTile(task, todayBlocks, actions) {
   name.className = "tile-name";
   name.textContent = task.name;
 
+  const percent = document.createElement("span");
+  percent.className = "tile-percent";
+  percent.textContent = goalPercentText(done, task.dailyGoal);
+
   const count = document.createElement("span");
   count.className = "tile-count";
-  count.textContent = countText(done, task.dailyGoal);
+  count.textContent = tileCountText(done, task.dailyGoal);
 
-  tile.append(name, count);
+  // Pusty, dopóki cel nie jest osiągnięty, żeby układ kafelka się nie zmieniał.
+  const check = document.createElement("span");
+  check.className = "tile-check";
+  check.textContent = goalReached ? "✓" : "";
+
+  // Kolejność ma znaczenie: style.css układa je w dwa wiersze po dwie kolumny.
+  tile.append(name, percent, count, check);
   tile.addEventListener("click", () => actions.addBlock(task.id));
   return tile;
-}
-
-// „1 / 2”, po osiągnięciu celu „2 / 2 ✓” (także „4 / 2 ✓”).
-// Zadanie bez celu pokazuje samą liczbę bloków.
-function countText(done, dailyGoal) {
-  if (dailyGoal === 0) {
-    return String(done);
-  }
-  if (isGoalReached(done, dailyGoal)) {
-    return `${done} / ${dailyGoal} ✓`;
-  }
-  return `${done} / ${dailyGoal}`;
 }

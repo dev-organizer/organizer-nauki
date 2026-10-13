@@ -30,6 +30,7 @@ Numery kroków są tylko w PLAN.md. Tu i w SPEC.md piszemy **wersja lokalna** (1
 - Każdy port (8123, 8124, 8125) to osobny adres, więc osobny `localStorage`: dane zaimportowane na jednym porcie nie są widoczne na pozostałych.
 - Testy: `tests.html` na tym samym serwerze pokazuje, które testy przeszły, a które nie i dlaczego. Sprawdzają logikę z `model.js`, `dates.js` i `report.js`, bez bibliotek.
 - Testy nie dotykają `localStorage`: `tests.html` jest też na GitHub Pages, obok prawdziwych danych.
+- Testy piszemy w `js/tests/*.test.js` funkcjami `describe`, `test`, `equal` i `throwsError` z `js/tests/check.js`, z datą i godziną podanymi wprost. Nowy plik testów dopisz do importów w `js/tests/run.js`.
 - Krok jest skończony, gdy:
   1. przechodzą wszystkie testy, nie tylko nowe;
   2. warunek „Gotowe, gdy” i scenariusz „Sprawdzenie” z kroku w PLAN.md są wykonane w przeglądarce, a konsola (F12) jest bez błędów;
@@ -43,7 +44,7 @@ Docelowa struktura (SPEC.md, sekcja 7). Pliki z dopiskiem „jeszcze nie ma” p
 
 ```
 index.html                szkielet i trzy zakładki: Dziś, Postęp, Zadania
-tests.html                strona testów (jeszcze nie ma)
+tests.html                strona testów
 css/style.css
 js/app.js                 start, wybór modułu zapisu, akcje, zakładki, odświeżanie widoku
 js/storage-local.js       zapis w localStorage (wersja lokalna)
@@ -56,7 +57,7 @@ js/views/today.js         ekran Dziś, opis bloku, lista dnia
 js/views/progress.js      wykres i sumy
 js/views/tasks.js         zadania, eksport, import, wylogowanie
 js/views/login.js         ekran logowania (wersja z bazą; jeszcze nie ma)
-js/tests/                 testy logiki (jeszcze nie ma)
+js/tests/                 testy logiki
 ```
 
 ## Architektura

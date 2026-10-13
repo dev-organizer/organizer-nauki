@@ -77,30 +77,17 @@ Funkcja F1. **Gotowe, gdy:** spełniony warunek z F1.
 
 **Zrobione:** 11.10.2026. Licznik łączny był wtedy ukryty do pierwszego zapisu; widoczny zawsze i z podpowiedzią przy 0 jest od kroku 2b.
 
-### Krok 2b. Testy, licznik łączny i napis startowy (1–2 bloki)
+### Krok 2b. Testy, licznik łączny i napis startowy
 
-Dopisany 11.10.2026, po kroku 2. Testy pozwalają od razu zauważyć, że nowa funkcja zepsuła starą.
+Strona `tests.html` z testami funkcji z `model.js` i `dates.js`: własna funkcja sprawdzająca w `js/tests/check.js`, bez bibliotek, a na stronie strefa czasowa przeglądarki (testy zmiany czasu coś sprawdzają tylko w strefie ze zmianą czasu). Teksty kafelka, sumy dnia i licznika łącznego są w `model.js`, więc testy je obejmują. Licznik łączny jest widoczny zawsze, od razu po otwarciu strony, a przy 0 blokach z podpowiedzią. Napis „Wczytywanie… Jeśli ten napis nie znika, odśwież stronę przez Ctrl+Shift+R.” pojawia się po ok. 2 s tylko wtedy, gdy aplikacja nie wystartowała.
 
-- **Opis.**
-  - Strona `tests.html` z krótką funkcją sprawdzającą (bez bibliotek) i testy funkcji z `model.js` i `dates.js`. Strona pokazuje też strefę czasową przeglądarki, bo testy zmiany czasu coś sprawdzają tylko w strefie ze zmianą czasu (np. `Europe/Warsaw`).
-  - Teksty kafelka i sumy dnia („2 / 2 ✓”, „Dziś: 5 z 9 bloków”) przechodzą z `views/today.js` do `model.js`, żeby testy je obejmowały.
-  - Licznik łączny według F1: widoczny zawsze, od razu po otwarciu strony, a przy 0 blokach z podpowiedzią. Dziś jest ukryty po każdym otwarciu strony aż do pierwszego kliknięcia (`state.lastBlock` startuje jako `null`), a nie tylko przy pustej historii.
-  - Napis startowy w `index.html`: „Wczytywanie… Jeśli ten napis nie znika, odśwież stronę przez Ctrl+Shift+R.” `app.js` chowa go dopiero na końcu startu (po narysowaniu widoku albo po pokazaniu komunikatu o błędzie wczytania), więc zostaje widoczny przy każdym nieprzewidzianym błędzie startu. Pojawia się z opóźnieniem ok. 2 s (CSS `animation-delay`), żeby nie migał przy każdym otwarciu. Dziś, gdy `app.js` się nie wczyta, np. gdy po wdrożeniu przeglądarka zmiesza stare i nowe pliki, widać tylko trzy przyciski zakładek, a w przypiętej karcie nikt nie zagląda do F12.
-- **Rezultat.** Każda kolejna zmiana od razu pokazuje, czy nie zepsuła czegoś, co już działało, a nieudany start strony mówi, co zrobić.
-- **Gotowe, gdy:** `tests.html` pokazuje, że wszystkie testy przechodzą; celowo zepsuty test pokazuje, który i dlaczego (potem cofamy zmianę); spełniony jest warunek z F1; napis startowy pojawia się tylko wtedy, gdy aplikacja nie wystartowała.
-- **Sprawdzenie:**
-  1. `tests.html` na serwerze lokalnym: wszystkie testy przechodzą, widać ich liczbę i strefę czasową.
-  2. Zmiana oczekiwanego wyniku w jednym teście: test nie przechodzi, a komunikat mówi, czego oczekiwał i co dostał. Potem cofnięcie zmiany.
-  3. Testy obejmują co najmniej: odmianę (1 blok, 2 bloki, 5 bloków, 12 bloków, 22 bloki), czas (0 min, 25 min, 2 h 5 min, 130 h), przejście przez koniec miesiąca i roku, zmianę czasu 25.10.2026 i 29.03.2026 (`lastDays` bez powtórzonych i zgubionych dni), godzinę tuż po północy, odrzucenie złych danych i danych z nowszej wersji (`upgradeData`), pominięcie zarchiwizowanych zadań w celu dnia, teksty kafelka (bez celu, przed celem, cel osiągnięty, ponad cel), tekst sumy dnia (cel 0, cel 1: „z 1 bloku”, cel 9).
-  4. Na serwerze lokalnym usunięcie klucza `organizerNauki` (F12 → Application → Local Storage) i odświeżenie: „Łącznie: 0 bloków” z podpowiedzią; po kliknięciu kafelka licznik rośnie o 1.
-  5. Odświeżenie strony, gdy bloki już są: licznik łączny widoczny od razu, bez klikania.
-  6. Tymczasowa literówka w ścieżce do `app.js` w `index.html`: po ok. 2 s widać napis o odświeżeniu. Po cofnięciu literówki napis nie pojawia się wcale.
-- **Zależności:** brak.
-- **Ryzyka:**
-  - testy zależne od bieżącej daty dają różne wyniki w różne dni → w testach datę i godzinę zawsze podajemy wprost;
-  - `tests.html` jest też na GitHub Pages, obok prawdziwych danych → testy nie dotykają `localStorage`.
-- **Do rozstrzygnięcia:** co liczy suma dnia. Dziś liczy wszystkie bloki, także zadań bez celu i ponad cel. Przykład: Python 2/2, Frontend 2/2, Rysunek 1/1, Angielski 1/4 i trzy bloki Claude Code dają „Dziś: 9 z 9”, choć Angielski jest daleko przed celem, czyli nagłówek ukrywa problem nr 2. Możliwości: zostawić; „Dziś: 9 bloków · cele: 6 z 9” (do celu liczy się najwyżej tyle bloków zadania, ile wynosi jego cel); albo inny pomysł.
-- **Do listy kontrolnej:** punkty 1–5 już obejmują ten krok.
+Decyzje (SPEC.md, F1):
+
+- suma dnia pokazuje osobno wszystkie bloki i postęp względem celu dnia, np. „Dziś: 9 bloków · 3 h 45 min · cele: 7 z 10”. Do celu każde zadanie liczy się najwyżej do swojego celu, więc Angielski 1 / 4 nie ginie za nadmiarem w innych zadaniach;
+- kafelek ma po prawej procent celu (0%, 25%, 100%, 150%…), a pod nim zielony ✓ po osiągnięciu celu. Kafelki mają co najmniej 11rem szerokości, żeby nazwa i procent mieściły się w jednej linijce;
+- Claude Code ma w danych startowych cel 1, więc cel dnia na start to 10.
+
+**Zrobione:** 13.10.2026.
 
 ## Etap 2. Codzienne używanie (kroki 3–4b)
 
@@ -145,7 +132,7 @@ Przed opisem bloku i dopisywaniem, bo od nich nie zależy, a chroni prawdziwe da
 - **Gotowe, gdy:** spełnione są warunki z F2 i warunek z F3 o usuwaniu.
 - **Sprawdzenie:**
   1. Kliknięcie „Python” → pole z podpowiedzią ostatniego opisu → wpisanie opisu i Enter → blok na liście z godziną, zadaniem i opisem.
-  2. Kliknięcie „Python” → Esc → blok na liście bez opisu, kafelek „2 / 2 ✓”.
+  2. Kliknięcie „Python” → Esc → blok na liście bez opisu, kafelek „2 / 2” z ✓.
   3. Usuń blok → Nie: nic się nie zmienia. Usuń → Tak: kafelek „1 / 2”, licznik łączny o 1 mniejszy.
   4. Odświeżenie strony: opisy i usunięcia zostają.
   5. Testy nowych funkcji z `model.js` (np. podpowiedź ostatniego opisu, kolejność listy).
@@ -244,7 +231,7 @@ Przed opisem bloku i dopisywaniem, bo od nich nie zależy, a chroni prawdziwe da
 - **Gotowe, gdy:** spełniony jest warunek z F4.
 - **Sprawdzenie:**
   1. Nowe zadanie „Kolaże GIMP” w ART → na ekranie „Dziś” w dziedzinie ART, w wybranym kolorze.
-  2. Cel „Rysunku” z 1 na 2 → suma dnia „z 10”.
+  2. Cel „Rysunku” z 1 na 2 → suma dnia „z 11”.
   3. Archiwizacja zadania z blokami → znika z ekranu „Dziś”; licznik łączny bez zmian; jego bloki nadal są na wykresie i w raporcie.
   4. Przywrócenie → zadanie wraca na ekran „Dziś”.
   5. Nazwa `<b>test</b>` wyświetla się dosłownie, bez pogrubienia (tekst nie jest traktowany jak HTML).

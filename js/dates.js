@@ -28,9 +28,9 @@ export function todayString() {
   return toDateString(new Date());
 }
 
-// Bieżąca godzina, np. "07:40".
-export function currentTime() {
-  const now = new Date();
+// Bieżąca godzina, np. "07:40". Testy podają godzinę wprost:
+// currentTime(new Date(2026, 9, 13, 0, 5)) → "00:05".
+export function currentTime(now = new Date()) {
   return `${twoDigits(now.getHours())}:${twoDigits(now.getMinutes())}`;
 }
 
