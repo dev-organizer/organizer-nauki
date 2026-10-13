@@ -18,7 +18,7 @@ Numery kroków są tylko w PLAN.md. Tu i w SPEC.md piszemy **wersja lokalna** (1
 - Biblioteki leżą w repozytorium (`js/vendor/`), nie na CDN (powody: SPEC.md, sekcja 8). Każdą pobierasz raz z paczki npm, a obok kładziesz jej licencję:
   - Chart.js 4.4.1: `js/vendor/chart.umd.js` (z `dist/chart.umd.js`). Wczytuje go `views/progress.js` przy pierwszym otwarciu „Postępu” (dodany `<script>`, czekanie na `load`); potem w kodzie globalne `Chart`. Ekran „Dziś” nie czeka na wykres.
   - supabase-js 2.x, tylko w wersji z bazą: `js/vendor/supabase.js` (z `dist/umd/supabase.js`), w wersji aktualnej w dniu dodania, wpisanej tutaj i w SPEC.md. Zwykły `<script>` przed `app.js`; tworzy globalną zmienną `supabase`, więc klienta nazywaj inaczej: `const client = window.supabase.createClient(…)` (zapis `const supabase = supabase.createClient(…)` w module daje błąd „Cannot access 'supabase' before initialization”). Plik `+esm` z jsDelivr się nie nadaje: importuje kolejne pliki z jsDelivr.
-- Przeglądarka docelowa to przeglądarka na komputerze w pracy, wersja: _uzupełnić po teście w pracy (13.10.2026)_. Nie używaj funkcji JavaScript ani CSS, których ta wersja nie zna (MDN, sekcja „Browser compatibility”). Do czasu wpisania wersji: nic młodszego niż ok. 3 lata (np. `Object.groupBy`).
+- Przeglądarka docelowa to Chrome 155 na komputerze w pracy (sprawdzone 13.10.2026). Nie używaj funkcji JavaScript ani CSS, których Chrome 155 nie zna (MDN, sekcja „Browser compatibility”). Telefon i czytnik Boox mogą mieć starsze przeglądarki: zanim aplikacja ma na nich działać, sprawdzamy, czego nie znają.
 - Dane: `localStorage` pod kluczem `organizerNauki`; w wersji z bazą przechodzą do Supabase.
 - Hosting: GitHub Pages pod adresem `https://kubiakraf.github.io/organizer-nauki/`. Plik `.nojekyll` musi zostać w repozytorium.
 
@@ -58,8 +58,6 @@ js/views/tasks.js         zadania, eksport, import, wylogowanie
 js/views/login.js         ekran logowania (wersja z bazą; jeszcze nie ma)
 js/tests/                 testy logiki (jeszcze nie ma)
 ```
-
-**Test pamięci przeglądarki (tymczasowy).** `test-pamieci.html` sprawdza, czy `localStorage` przetrwa do następnego dnia (klucz `organizerNauki-test`, końcowe sprawdzenie we wtorek 13.10.2026). Wcześniej był w `index.html`; `localStorage` jest wspólny dla całej domeny `kubiakraf.github.io`, więc dane testu są widoczne pod nowym adresem. Usuń plik i ten akapit dopiero, gdy użytkownik potwierdzi wynik testu. To co innego niż `tests.html` (testy logiki).
 
 ## Architektura
 

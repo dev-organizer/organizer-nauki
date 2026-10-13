@@ -52,23 +52,16 @@ Repozytorium i GitHub Pages działają, CLAUDE.md jest w repozytorium, a test pa
 
 **Zrobione:** 11.10.2026.
 
-### Krok 0b. Komputer w pracy (poza kolejnością: wtorek 13.10.2026)
+### Krok 0b. Komputer w pracy
 
-Nie blokuje kroków 2b–4b. Sprawdzenie robisz we wtorek w pracy, niezależnie od tego, na którym kroku jest budowa; potem krótka sesja z Claude Code, która zapisuje wyniki.
+Sprawdzenie na komputerze w pracy 13.10.2026:
 
-- **Opis.**
-  - `test-pamieci.html` następnego dnia: czy dane przetrwały.
-  - Nazwa i wersja przeglądarki (Edge: `edge://settings/help`, Chrome: `chrome://settings/help`). Wersja trafia do CLAUDE.md jako zasada: kod nie używa funkcji JavaScript ani CSS, których ta przeglądarka nie zna (np. `Object.groupBy` w starszej wersji).
-  - Czy otwiera się `https://supabase.com`. Wersja z bazą i plan B na tym stoją; pełne sprawdzenie adresu projektu jest w kroku 9.
-  - Po potwierdzeniu wyniku: „Wyczyść test” na stronie testu w pracy, a w repozytorium usunięcie `test-pamieci.html` i akapitu o nim z CLAUDE.md.
-  - Sprawdzenie jsDelivr odpada: biblioteki leżą w repozytorium (SPEC.md, sekcja 8).
-- **Rezultat.** Wiadomo, że dane w przeglądarce przetrwają noc i pod jaką przeglądarkę piszemy kod.
-- **Gotowe, gdy:** przy tym kroku zapisane są wynik testu pamięci, nazwa i wersja przeglądarki oraz to, czy otwiera się supabase.com; wersja przeglądarki jest w CLAUDE.md; `test-pamieci.html` jest usunięty.
-- **Zależności:** brak.
-- **Ryzyka i plan B:**
-  - dane nie przetrwały nocy, a supabase.com się otwiera → po kroku 3 (kopia) idą kroki 9–12, a dopiero potem 4a i dalej. Do końca kroku 11b eksport na koniec każdego dnia i import, gdy dane znikną. Lista kontrolna sprawdza wtedy tylko to, co już zbudowane. Nie ma też jeszcze wykresu ani danych testowych z kroku 5: w krokach 11b i 12 porównujemy licznik łączny, a konto testowe dostaje kilka bloków klikniętych ręcznie;
-  - dane nie przetrwały nocy i supabase.com jest zablokowany → stop i decyzja, co dalej, zanim powstanie kolejny kod;
-  - przeglądarka jest stara → mniej nowych funkcji JavaScript w kodzie; pilnuje tego zasada w CLAUDE.md.
+- test pamięci (`test-pamieci.html`): dane przetrwały zamknięcie przeglądarki, restart komputera i dwie noce (4. otwarcie, pierwsze 11.10.2026), więc kolejność kroków zostaje bez zmian;
+- przeglądarka: Chrome 155. Zasada w CLAUDE.md: kod używa tylko tego, co zna Chrome 155. Telefon i czytnik Boox mogą mieć starsze przeglądarki, więc sprawdzamy je, zanim aplikacja ma na nich działać;
+- `https://supabase.com` się otwiera. Pełne sprawdzenie adresu projektu (`/rest/v1/`) jest w kroku 9;
+- test wyczyszczony w pracy („Wyczyść test”), a `test-pamieci.html` i akapit o nim usunięte z repozytorium.
+
+**Zrobione:** 13.10.2026.
 
 ### Krok 1. Szkielet i dane (1–2 bloki)
 
@@ -113,7 +106,7 @@ Dopisany 11.10.2026, po kroku 2. Testy pozwalają od razu zauważyć, że nowa f
 
 ### Krok 3. Kopia zapasowa (2–3 bloki)
 
-Przed opisem bloku i dopisywaniem, bo od nich nie zależy, a chroni prawdziwe dane od pierwszego dnia (także w planie B z kroku 0b).
+Przed opisem bloku i dopisywaniem, bo od nich nie zależy, a chroni prawdziwe dane od pierwszego dnia.
 
 - **Opis.** F7: „Eksportuj dane” i „Importuj dane” w zakładce „Zadania” (lista zadań dojdzie w kroku 7).
   - Sprawdzanie pliku w `model.js`, z testami. Jest tak samo surowe jak baza z sekcji 6.3 SPEC.md, więc plik, który przejdzie import lokalnie, przejdzie też import do bazy w kroku 11b. Pełna lista warunków jest w F7.
@@ -302,7 +295,7 @@ Ten krok to klikanie w panelu Supabase, nie kod. Konto zakładasz sam.
 - **Rezultat.** Baza i konta są gotowe i zabezpieczone, zanim powstanie kod.
 - **Gotowe, gdy:** w Table Editor są tabele `tasks` i `blocks`, obie z włączonym RLS; Advisory nie zgłaszają błędów ani ostrzeżeń; są dwa konta, a rejestracja jest wyłączona; adres projektu odpowiada z komputera w pracy; jest klucz `sb_publishable_…`; sposób odzyskania hasła jest zapisany przy tym kroku, a adres Twojego konta w aplikacji może dostać mail z panelu.
 - **Sprawdzenie:** Table Editor (oznaczenie RLS przy tabelach), oba Advisory, lista użytkowników, ustawienie rejestracji, strona kluczy, adres `/rest/v1/` otwarty w pracy.
-- **Zależności:** krok 8 (wersja 1.0); w planie B z kroku 0b: krok 3.
+- **Zależności:** krok 8 (wersja 1.0).
 - **Ryzyka:**
   - sieć w pracy blokuje `*.supabase.co` → stop przed pisaniem kodu i decyzja, co dalej;
   - klucz sekretny (`sb_secret_…`, dawniej `service_role`) daje pełny dostęp z pominięciem RLS → nigdy do plików, repozytorium ani czatu; do kodu trafia tylko `sb_publishable_…`;
