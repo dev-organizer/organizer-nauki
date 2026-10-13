@@ -1,6 +1,6 @@
 # Organizer nauki: specyfikacja MVP
 
-Wersja 6 · 12 października 2026
+Wersja 7 · 13 października 2026
 
 Prosty dziennik 25-minutowych bloków nauki. Jedno kliknięcie zapisuje blok, kafelki pokazują postęp dnia względem celu, a wykres pokazuje postęp z dnia na dzień.
 
@@ -75,7 +75,7 @@ Jeden użytkownik. Głównie przeglądarka na komputerze w pracy (własne konto 
 ### F4. Zadania (zakładka „Zadania”)
 
 - Lista zadań pogrupowana w dziedziny.
-- Dodawanie i edycja zadania: nazwa, dziedzina, kolor, cel dzienny (liczba bloków, 0 = bez celu).
+- Dodawanie i edycja zadania: nazwa, dziedzina, kolor, cel dzienny (liczba bloków od 0 do 100, 0 = bez celu).
 - Archiwizacja zamiast usuwania: zadanie znika z ekranu „Dziś”, ale jego bloki zostają w historii i na wykresie. Zarchiwizowane zadanie można przywrócić.
 - Dziedziny są w MVP stałe: Programowanie, Angielski, ART.
 
@@ -105,16 +105,18 @@ Jeden użytkownik. Głównie przeglądarka na komputerze w pracy (własne konto 
 
 ### F7. Kopia zapasowa
 
-- „Eksportuj dane” pobiera plik `organizer-nauki-RRRR-MM-DD.json`.
-- „Importuj dane” wczytuje taki plik i po potwierdzeniu na stronie zastępuje obecne dane. Potwierdzenie pokazuje liczbę zadań i bloków oraz datę ostatniego bloku w pliku i w obecnych danych. Gdy w pliku jest mniej bloków, wyraźnie ostrzega, bo najczęstsza pomyłka to stara kopia.
+- W zakładce „Zadania” sekcja „Kopia zapasowa” z przyciskami „Eksportuj dane” i „Importuj dane” oraz „Ostatnia kopia: dziś” („wczoraj”, „9 dni temu”, przed pierwszym eksportem „jeszcze żadnej”). Datę ostatniego eksportu przeglądarka pamięta osobno od danych, bo to informacja o tej przeglądarce, a nie część kopii.
+- „Eksportuj dane” pobiera plik `organizer-nauki-RRRR-MM-DD.json` z wcięciami (da się go przeczytać w Notatniku) i mówi, że plik jest w folderze pobranych plików.
+- „Importuj dane” wczytuje taki plik i po potwierdzeniu na stronie („Tak, zastąp / Nie”) zastępuje obecne dane. Potwierdzenie pokazuje liczbę zadań i bloków oraz datę i godzinę ostatniego bloku w pliku i w obecnych danych. Gdy w pliku jest mniej bloków, wyraźnie ostrzega, bo najczęstsza pomyłka to stara kopia. Przejście do innej zakładki działa jak „Nie”.
 - Import sprawdza plik tak samo surowo jak baza (sekcja 6.3), więc plik, który przejdzie import lokalnie, przejdzie też import do bazy:
-  - każde `id` w formacie UUID i bez powtórzeń;
-  - `name` niepusty tekst, `domainId` z listy dziedzin, `color` w formacie `#rrggbb`, `dailyGoal` liczba całkowita ≥ 0, `archived` prawda albo fałsz;
-  - `date` jako `RRRR-MM-DD` z istniejącą datą, `time` jako `GG:MM`, `minutes` liczba całkowita > 0, `note` tekst;
+  - każde `id` w formacie UUID z małymi literami (jak z `crypto.randomUUID()`) i bez powtórzeń w całym pliku;
+  - `name` niepusty tekst, `domainId` z listy dziedzin, `color` w formacie `#rrggbb`, `dailyGoal` liczba całkowita od 0 do 100, `archived` prawda albo fałsz;
+  - `date` jako `RRRR-MM-DD` z istniejącą datą, `time` jako `GG:MM` od 00:00 do 23:59, `minutes` liczba całkowita od 1 do 1440, `note` tekst;
   - każdy blok wskazuje zadanie z tego samego pliku.
-- Plik, który nie jest kopią organizera albo ma błędne pola, daje komunikat (które pole i dlaczego), a dane zostają bez zmian.
-- Gdy zapisanych danych nie da się wczytać (np. są uszkodzone), komunikat o błędzie ma „Pobierz uszkodzone dane” (surowy tekst do pliku, żeby dało się je odratować; nazwa pliku też zaczyna się od `organizer-nauki-`) i import kopii. Właśnie wtedy kopia jest najbardziej potrzebna.
-- Przy 0 blokach na ekranie „Dziś”, obok podpowiedzi, jest link „Masz kopię? Importuj”. Po wyczyszczeniu przeglądarki aplikacja zaczyna od nowa i bez tego linku łatwo to przeoczyć.
+- Plik, który nie jest kopią organizera albo ma błędne pola, daje komunikat z pierwszym znalezionym błędem (które pole i dlaczego, np. „Blok nr 12 (2026-10-12 24:00): pole „time” ma wartość "24:00", a powinno być godziną w formacie GG:MM…”), a dane zostają bez zmian.
+- Udany import kasuje czekające „Spróbuj ponownie”: dotyczą starych danych, a blok wskazywałby zadanie, którego po imporcie już nie ma.
+- Gdy zapisanych danych nie da się wczytać (np. są uszkodzone), zamiast zakładek pojawia się panel „Nie udało się wczytać danych”. Mówi, co się stało i że nic nie zostało nadpisane, a potem prowadzi przez dwa kroki: „Pobierz uszkodzone dane” (surowy tekst do pliku `organizer-nauki-uszkodzone-RRRR-MM-DD.txt`, żeby dało się je odratować) i „Importuj kopię”, z tym samym potwierdzeniem i datą ostatniej kopii. Pod spodem jest „Spróbuj ponownie” na wypadek, gdy dane poprawiono inaczej. Właśnie wtedy kopia jest najbardziej potrzebna.
+- Przy 0 blokach na ekranie „Dziś”, obok podpowiedzi, jest link „Masz kopię? Importuj”. Przenosi do „Zadań” i od razu otwiera wybór pliku. Po wyczyszczeniu przeglądarki aplikacja zaczyna od nowa i bez tego linku łatwo to przeoczyć.
 
 **Gotowe, gdy:** eksport, wyczyszczenie danych i import przywracają wszystko; zły plik daje komunikat i niczego nie zmienia; plik z mniejszą liczbą bloków daje ostrzeżenie; przy celowo uszkodzonych danych da się pobrać ich surowy tekst i zaimportować kopię.
 
@@ -189,11 +191,11 @@ Przykładowy blok:
 | `id` | UUID z `crypto.randomUUID()`, także dla zadań startowych, żeby dane dało się bez zmian przenieść do bazy |
 | `tasks[].domainId` | `prog`, `eng` albo `art` |
 | `tasks[].color` | kolor `#rrggbb` (taki format daje `<input type="color">`) |
-| `tasks[].dailyGoal` | cel dzienny w blokach; 0 = bez celu |
+| `tasks[].dailyGoal` | cel dzienny w blokach, od 0 do 100; 0 = bez celu |
 | `tasks[].archived` | zarchiwizowane zadanie nie pokazuje się na ekranie „Dziś”, ale zostaje w historii |
 | `blocks[].date` | dzień bloku `RRRR-MM-DD` w czasie lokalnym |
 | `blocks[].time` | godzina `GG:MM` |
-| `blocks[].minutes` | w MVP zawsze 25; pole na przyszłe bloki innej długości |
+| `blocks[].minutes` | w MVP zawsze 25; pole na przyszłe bloki innej długości (od 1 do 1440) |
 | `blocks[].note` | opcjonalny opis; pusty tekst, gdy brak |
 
 Zmiana formatu (`version`) to też zmiana sposobu wycofania błędu: przeglądarka, która raz otworzyła nową wersję, ma już dane w nowym formacie, a stary kod je odrzuci. Samo cofnięcie kodu nie wystarczy; potrzebny jest też import kopii sprzed zmiany.
@@ -212,7 +214,7 @@ create table tasks (
   domain_id   text not null check (domain_id in ('prog', 'eng', 'art')),
   name        text not null check (btrim(name) <> ''),
   color       text not null check (color ~* '^#[0-9a-f]{6}$'),
-  daily_goal  int  not null default 0 check (daily_goal >= 0),
+  daily_goal  int  not null default 0 check (daily_goal between 0 and 100),
   archived    boolean not null default false,
   created_at  timestamptz not null default now(),
   primary key (user_id, id)
@@ -224,7 +226,7 @@ create table blocks (
   task_id     uuid not null,
   date        date not null,
   time        time not null,
-  minutes     int  not null default 25 check (minutes > 0),
+  minutes     int  not null default 25 check (minutes between 1 and 1440),
   note        text not null default '',
   created_at  timestamptz not null default now(),
   primary key (user_id, id),
@@ -284,14 +286,19 @@ Potwierdzenia („Usunąć? Tak / Nie”) i komunikaty są na stronie, a nie w o
 **Wspólny interfejs zapisu.** Oba moduły zapisu mają te same funkcje i od pierwszego dnia są asynchroniczne (zwracają `Promise`), także wersja na `localStorage`. Dzięki temu przejście na bazę to wymiana jednego pliku, bez zmian w widokach.
 
 ```
-load()             → Promise<{ tasks, blocks }>
-addBlock(block)    → Promise<block>
-updateBlock(block) → Promise<block>     zmienia zapisany blok, np. dopisany opis (F2)
-deleteBlock(id)    → Promise<void>
-saveTask(task)     → Promise<task>      dodaje albo aktualizuje
-replaceAll(data)   → Promise<void>      import pliku
-exportAll()        → Promise<data>
+load()                   → Promise<{ tasks, blocks }>
+addBlock(block)          → Promise<block>
+updateBlock(block)       → Promise<block>     zmienia zapisany blok, np. dopisany opis (F2)
+deleteBlock(id)          → Promise<void>
+saveTask(task)           → Promise<task>      dodaje albo aktualizuje
+replaceAll(data)         → Promise<void>      import pliku
+exportAll()              → Promise<data>
+loadLastExportDate()     → Promise<date | null>   data "RRRR-MM-DD" do „Ostatnia kopia” (F7)
+saveLastExportDate(date) → Promise<void>
 ```
+
+- Datę ostatniego eksportu obie wersje trzymają w `localStorage` tej przeglądarki (klucz `organizerNaukiLastExport`), bo kopia leży na tym komputerze, a nie w bazie.
+- Gdy zapisanych danych nie da się odczytać, błąd z `load()` w wersji lokalnej ma pole `rawText` z surowym tekstem. Dzięki temu „Pobierz uszkodzone dane” (F7) działa bez sięgania do `localStorage` poza modułem zapisu. W wersji z bazą dane sprawdza baza, więc tego pola nie ma.
 
 Pliki:
 
@@ -308,7 +315,7 @@ js/report.js              tekst raportu w Markdown (F6)
 js/vendor/                Chart.js i supabase-js z licencjami (sekcja 8)
 js/views/today.js         ekran Dziś, opis bloku, lista dnia
 js/views/progress.js      wykres i sumy
-js/views/tasks.js         zadania, eksport, import, wylogowanie
+js/views/tasks.js         zadania, eksport, import, panel uszkodzonych danych, wylogowanie
 js/views/login.js         ekran logowania (wersja z bazą)
 js/tests/                 testy logiki
 ```

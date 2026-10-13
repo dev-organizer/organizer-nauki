@@ -43,6 +43,7 @@ Jedna lista zamiast warunków rozrzuconych po krokach. Przechodzisz ją na serwe
 3. Kliknięcie kafelka: kafelek, suma dnia i licznik łączny rosną o 1.
 4. Odświeżenie strony: stan zostaje.
 5. Przejście przez wszystkie zakładki: konsola (F12) bez błędów.
+6. Eksport pobiera plik. Import tego pliku → potwierdzenie z liczbą bloków → Nie: dane bez zmian (od kroku 3).
 
 ## Etap 1. Fundament (kroki 0a–2b)
 
@@ -91,39 +92,40 @@ Decyzje (SPEC.md, F1):
 
 ## Etap 2. Codzienne używanie (kroki 3–4b)
 
-### Krok 3. Kopia zapasowa (2–3 bloki)
+### Krok 3. Kopia zapasowa
 
-Przed opisem bloku i dopisywaniem, bo od nich nie zależy, a chroni prawdziwe dane od pierwszego dnia.
+F7: sekcja „Kopia zapasowa” w zakładce „Zadania” (eksport, import, „Ostatnia kopia”), sprawdzanie pliku w `model.js` tak samo surowe jak baza, z testami w `js/tests/import.test.js`, oraz link „Masz kopię? Importuj” na ekranie „Dziś” przy 0 blokach.
 
-- **Opis.** F7: „Eksportuj dane” i „Importuj dane” w zakładce „Zadania” (lista zadań dojdzie w kroku 7).
-  - Sprawdzanie pliku w `model.js`, z testami. Jest tak samo surowe jak baza z sekcji 6.3 SPEC.md, więc plik, który przejdzie import lokalnie, przejdzie też import do bazy w kroku 11b. Pełna lista warunków jest w F7.
-  - Potwierdzenie importu na stronie (nie przez `confirm()`), z liczbą zadań i bloków oraz datą ostatniego bloku w pliku i w obecnych danych. Gdy w pliku jest mniej bloków, wyraźne ostrzeżenie: najczęstsza pomyłka to stara kopia.
-  - Przy uszkodzonych danych komunikat z „Pobierz uszkodzone dane” (surowy tekst do pliku, którego nazwa też zaczyna się od `organizer-nauki-`) i z importem kopii.
-  - Przy 0 blokach na ekranie „Dziś”, obok podpowiedzi, link „Masz kopię? Importuj”. Po wyczyszczeniu przeglądarki aplikacja po cichu zaczyna od nowa, z nowymi `id` zadań.
-- **Rezultat.** Prawdziwe dane mają kopię poza przeglądarką, a na serwerze lokalnym możesz wczytać dane testowe (potrzebne w krokach 5–6).
-- **Gotowe, gdy:** spełniony jest warunek z F7.
-- **Sprawdzenie (na serwerze lokalnym):**
-  1. Eksport → pobiera się `organizer-nauki-RRRR-MM-DD.json` z dzisiejszą datą.
-  2. Usunięcie klucza `organizerNauki` i odświeżenie → link „Masz kopię? Importuj” → import pliku → potwierdzenie z liczbą zadań i bloków → Tak → wracają wszystkie zadania i bloki, licznik łączny jak przed eksportem.
-  3. Import → Nie: dane bez zmian.
-  4. Import pliku z mniejszą liczbą bloków niż w obecnych danych → wyraźne ostrzeżenie w potwierdzeniu.
-  5. Import innego pliku JSON → komunikat, dane bez zmian.
-  6. Wpisanie w `organizerNauki` tekstu `zepsute` i odświeżenie → komunikat o uszkodzonych danych → „Pobierz uszkodzone dane” daje plik z tekstem `zepsute` → import przywraca dane.
-  7. Testy sprawdzania pliku: dobry plik, brak pól, zły typ pola, nowsza wersja, `id`, które nie jest UUID, powtórzone `id`, nieznana dziedzina, kolor spoza formatu `#rrggbb`, data `2026-02-30`, godzina `24:00`, blok wskazujący nieistniejące zadanie.
-  8. Na komputerze w pracy: eksport działa i wiadomo, w którym folderze ląduje plik.
-- **Zależności:** krok 2b.
+Decyzje (SPEC.md, F7):
+
+- przy uszkodzonych danych zamiast zakładek jest panel: co się stało, „nic nie zostało nadpisane”, potem 1. „Pobierz uszkodzone dane”, 2. „Importuj kopię” i na dole „Spróbuj ponownie”;
+- „Ostatnia kopia: 9 dni temu” tylko w zakładce „Zadania”. Datę trzyma osobny klucz `organizerNaukiLastExport`, a moduł zapisu ma dwie nowe funkcje: `loadLastExportDate()` i `saveLastExportDate(date)`;
+- link „Masz kopię? Importuj” przenosi do „Zadań” i otwiera wybór pliku; przejście do innej zakładki działa jak „Nie”;
+- komunikat o złym pliku podaje pierwszy znaleziony błąd. Cel dzienny ma granice 0–100, a blok 1–1440 minut, w imporcie i w SQL (SPEC.md, sekcja 6.3);
+- osobny adres strony: zaraz po tym kroku (krok 3b).
+
+Sprawdzenie na komputerze w pracy (eksport działa i wiadomo, w którym folderze ląduje plik) robisz przy pierwszym eksporcie prawdziwych danych.
+
+**Zrobione:** 13.10.2026.
+
+### Krok 3b. Osobny adres strony (1 blok)
+
+- **Opis.** Organizer przenosi się pod osobny adres w darmowej organizacji na GitHubie, zanim pod `kubiakraf.github.io` pojawią się inne projekty (np. z kursu frontendu). Wszystkie strony pod jednym adresem mają wspólny `localStorage`: mogą odczytać albo skasować dane organizera, a w wersji z bazą odczytać token sesji (SPEC.md, sekcja 7). Przeprowadzka danych to eksport na starym adresie i import na nowym (krok 3).
+- **Rezultat.** Projekty z kursu możesz publikować pod `kubiakraf.github.io` bez ryzyka dla danych organizera, a przypięta karta i kopie od początku działają pod docelowym adresem.
+- **Gotowe, gdy:** aplikacja działa pod nowym adresem z prawdziwymi danymi, a stary adres nie trzyma już danych organizera.
+- **Sprawdzenie:**
+  1. W pracy, jeszcze pod starym adresem: eksport prawdziwych danych.
+  2. Nowy adres: strona, `tests.html`, konsola bez błędów (Ctrl+Shift+R).
+  3. W pracy pod nowym adresem: import kopii → licznik łączny jak przed eksportem.
+  4. Stary adres: klucze `organizerNauki` i `organizerNaukiLastExport` usunięte (F12 → Application → Local Storage; działa na każdej stronie pod `kubiakraf.github.io`, także na stronie błędu 404).
+  5. Nowy adres w przypiętej karcie. CLAUDE.md, SPEC.md i PLAN.md mają nowy adres.
+- **Zależności:** krok 3.
 - **Ryzyka:**
-  - pomyłkowy import nadpisze prawdziwe dane, najczęściej starszą kopią → potwierdzenie z liczbą bloków i datą ostatniego bloku, ostrzeżenie przy mniejszej liczbie bloków;
-  - przy uszkodzonych danych zakładki się nie rysują (`render()` czeka na dane) → pobranie surowych danych i import w komunikacie o błędzie, poza zakładkami;
-  - przeglądarka w pracy może blokować pobieranie plików → sprawdzenie 8;
-  - kopia w folderze Pobrane chroni przed wyczyszczeniem przeglądarki, ale nie przed awarią komputera → pełne rozwiązanie to baza (kroki 9–12);
-  - kopia trafi do publicznego repozytorium, a w niej prywatne opisy bloków → pliki `organizer-nauki-*` są w `.gitignore` (od 12.10.2026), z każdym rozszerzeniem;
-  - inne strony pod `kubiakraf.github.io` (np. projekty z kursu) mają ten sam `localStorage`, więc mogą odczytać albo skasować dane organizera (w poradnikach często jest `localStorage.clear()`) → pytanie o osobny adres niżej.
-- **Do rozstrzygnięcia:**
-  - gdzie dokładnie są pobranie i import przy uszkodzonych danych;
-  - czy w zakładce „Zadania” pokazywać „Ostatnia kopia: 9 dni temu” (bez przypomnienia eksport raz w tygodniu rzadko przetrwa miesiąc), a jeśli tak, gdzie zapisać datę ostatniego eksportu; jeśli nie, pomysł trafia do ROADMAP.md;
-  - osobny adres strony już teraz czy dopiero przed logowaniem (krok 10)? Darmowa organizacja na GitHubie daje osobny adres `<nazwa>.github.io`. Przeprowadzka to eksport na starym adresie i import na nowym, więc najtaniej zrobić ją zaraz po tym kroku, zanim pod `kubiakraf.github.io` pojawią się inne projekty.
-- **Do listy kontrolnej:** „Eksport pobiera plik. Import tego pliku → potwierdzenie z liczbą bloków → Nie: dane bez zmian.”
+  - GitHub przekierowuje stary adres przeniesionego repozytorium, ale nie stronę na GitHub Pages → najpierw eksport (sprawdzenie 1), dopiero potem przeniesienie;
+  - stare dane zostają w `localStorage` pod `kubiakraf.github.io`, z prywatnymi opisami bloków → sprawdzenie 4;
+  - inna strona dodana później pod nowy adres znów dzieliłaby `localStorage` → pod nowym adresem jest tylko organizer.
+- **Do rozstrzygnięcia:** nazwa organizacji (będzie w adresie strony); przeniesienie repozytorium do organizacji (historia i link z portfolio zostają) czy nowe repozytorium; adres `<nazwa>.github.io` (repozytorium o tej nazwie) czy `<nazwa>.github.io/organizer-nauki/`.
+- **Do listy kontrolnej:** nic.
 
 ### Krok 4a. Opis bloku, lista dnia, usuwanie (2 bloki)
 
@@ -148,7 +150,8 @@ Przed opisem bloku i dopisywaniem, bo od nich nie zależy, a chroni prawdziwe da
   - co z wpisanym tekstem przy kliknięciu obok pola: zapisać czy wyrzucić? Wyrzucenie to tekst, który ginie po cichu, a F2 mówi dziś „zamyka pole bez opisu”;
   - co z otwartym polem, gdy klikniesz inny kafelek;
   - gdzie pojawia się pole, żeby nie przesuwało kafelków pod kursorem (dół okna zajmuje komunikat o błędzie);
-  - podwójne kliknięcie kafelka: dziś daje dwa bloki. Czy kafelek ma przez chwilę (np. 1 s) ignorować drugie kliknięcie? Ta sama decyzja obowiązuje w wersji z bazą (krok 11a), gdzie zapis trwa dłużej.
+  - podwójne kliknięcie kafelka: dziś daje dwa bloki. Czy kafelek ma przez chwilę (np. 1 s) ignorować drugie kliknięcie? Ta sama decyzja obowiązuje w wersji z bazą (krok 11a), gdzie zapis trwa dłużej;
+  - czy pole „Co konkretnie?” ma przycisk „Cofnij”, który jednym kliknięciem usuwa właśnie zapisany blok (pomyłka zauważona od razu, np. zły kafelek)? Usuwanie z listy z potwierdzeniem zostaje na pomyłki zauważone później.
 - **Do listy kontrolnej:** „Kliknięcie kafelka → opis → Enter: blok z opisem na liście. Usuń → Tak: kafelek i licznik łączny o 1 mniej.”
 
 ### Krok 4b. Dopisywanie po fakcie i lista innych dni (1–2 bloki)
@@ -307,7 +310,7 @@ Ten krok to klikanie w panelu Supabase, nie kod. Konto zakładasz sam.
   6. W kodzie są tylko adres projektu i klucz `sb_publishable_…`.
 - **Zależności:** krok 9.
 - **Ryzyka:**
-  - wszystkie strony pod `kubiakraf.github.io` mają wspólny `localStorage`, a w nim token sesji → jeśli w kroku 3 nie zapadła decyzja o osobnym adresie, wracamy do niej teraz; najpóźniej przed danymi o zdrowiu (ROADMAP.md);
+  - wszystkie strony pod jednym adresem mają wspólny `localStorage`, a w nim token sesji → organizer ma od kroku 3b osobny adres; sprawdzamy, że pod nim nie ma innych projektów;
   - menedżer haseł nie podpowiada danych → pola formularza z `autocomplete="email"` i `autocomplete="current-password"`.
 - **Do rozstrzygnięcia:** co widać przy starcie, zanim aplikacja sprawdzi sesję (żeby nie mignął ekran logowania); co aplikacja robi po wejściu z linku odzyskiwania hasła (formularz nowego hasła czy tylko instrukcja).
 - **Do listy kontrolnej:** „Wyloguj → ekran logowania → logowanie na konto testowe → aplikacja.”

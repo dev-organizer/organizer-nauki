@@ -8,22 +8,21 @@
 // kończy funkcję odrzuconym Promise, żeby widok mógł pokazać komunikat.
 
 import { createStartData, upgradeData } from "./model.js";
+import { isValidDate } from "./dates.js";
 
 // Pod tym kluczem leży cały obiekt danych.
 const KEY = "organizerNauki";
 
-// Czyta dane z localStorage. Zwraca null, gdy jeszcze nic nie zapisano.
-function readSaved() {
-  const text = localStorage.getItem(KEY);
-  if (text === null) {
-    return null;
-  }
-  try {
-    return JSON.parse(text);
-  } catch (error) {
-    // Nie nadpisujemy uszkodzonych danych danymi startowymi: zostają do odratowania.
-    throw new Error("Zapisane dane są uszkodzone i nie da się ich odczytać.");
-  }
+// Data ostatniego eksportu („Ostatnia kopia: …”). Osobno od danych, bo to informacja
+// o tej przeglądarce, a nie część kopii.
+const LAST_EXPORT_KEY = "organizerNaukiLastExport";
+
+// Błąd odczytu z surowym tekstem zapisanych danych w polu rawText. Dzięki niemu
+// aplikacja może zaproponować „Pobierz uszkodzone dane”, nie sięgając do localStorage.
+function damagedDataError(message, rawText) {
+  const error = new Error(message);
+  error.rawText = rawText;
+  return error;
 }
 
 function write(data) {
@@ -31,16 +30,29 @@ function write(data) {
 }
 
 // Dane w bieżącej wersji formatu. Przy pierwszym uruchomieniu zapisuje dane startowe.
+// Uszkodzonych danych nie nadpisujemy danymi startowymi: zostają do odratowania.
 function readData() {
-  const saved = readSaved();
-  if (saved === null) {
+  const text = localStorage.getItem(KEY);
+  if (text === null) {
     const startData = createStartData();
     write(startData);
     return startData;
   }
 
-  const savedVersion = saved.version;
-  const data = upgradeData(saved);
+  let saved;
+  try {
+    saved = JSON.parse(text);
+  } catch (error) {
+    throw damagedDataError("Zapisane dane są uszkodzone i nie da się ich odczytać.", text);
+  }
+
+  const savedVersion = saved?.version;
+  let data;
+  try {
+    data = upgradeData(saved);
+  } catch (error) {
+    throw damagedDataError(error.message, text);
+  }
   if (data.version !== savedVersion) {
     write(data);
   }
@@ -88,4 +100,18 @@ export async function replaceAll(data) {
 // Zwraca wszystkie dane do zapisania w pliku eksportu.
 export async function exportAll() {
   return readData();
+}
+
+// Data ostatniego eksportu "RRRR-MM-DD" albo null, gdy eksportu jeszcze nie było.
+export async function loadLastExportDate() {
+  const date = localStorage.getItem(LAST_EXPORT_KEY);
+  if (isValidDate(date)) {
+    return date;
+  }
+  return null;
+}
+
+// Zapamiętuje datę eksportu, np. "2026-10-13".
+export async function saveLastExportDate(date) {
+  localStorage.setItem(LAST_EXPORT_KEY, date);
 }

@@ -25,9 +25,15 @@
          tylko wtedy, gdy aplikacja nie wystartowała (np. nie wczytał się app.js). -->
     <p id="loading">Wczytywanie… Jeśli ten napis nie znika, odśwież stronę przez Ctrl+Shift+R.</p>
 
+    <!-- Panel zamiast zakładek, gdy zapisanych danych nie da się odczytać (F7). -->
+    <section id="damaged" hidden></section>
+
     <section id="today" hidden></section>
     <section id="progress" hidden></section>
     <section id="tasks" hidden></section>
   </main>
+
+  <!-- Wybór pliku kopii do importu. Ukryty: otwierają go przyciski „Importuj”. -->
+  <input type="file" id="import-file" accept=".json,application/json" hidden>
 </body>
 </html>

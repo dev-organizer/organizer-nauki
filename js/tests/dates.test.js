@@ -13,6 +13,10 @@ import {
   dayShort,
   dayLabel,
   formatDuration,
+  daysBetween,
+  isValidDate,
+  isValidTime,
+  formatDate,
 } from "../dates.js";
 
 describe("toDateString", () => {
@@ -120,5 +124,71 @@ describe("formatDuration", () => {
   });
   test("130 h", () => {
     equal(formatDuration(7800), "130 h");
+  });
+});
+
+describe("daysBetween", () => {
+  test("ten sam dzień", () => {
+    equal(daysBetween("2026-10-13", "2026-10-13"), 0);
+  });
+  test("9 dni", () => {
+    equal(daysBetween("2026-10-04", "2026-10-13"), 9);
+  });
+  test("przez koniec roku", () => {
+    equal(daysBetween("2026-12-31", "2027-01-01"), 1);
+  });
+  test("wstecz daje liczbę ujemną", () => {
+    equal(daysBetween("2026-10-13", "2026-10-12"), -1);
+  });
+  test("przez zmianę czasu 25.10.2026 (dzień ma 25 godzin)", () => {
+    equal(daysBetween("2026-10-24", "2026-10-26"), 2);
+  });
+  test("przez zmianę czasu 29.03.2026 (dzień ma 23 godziny)", () => {
+    equal(daysBetween("2026-03-28", "2026-03-30"), 2);
+  });
+});
+
+describe("isValidDate", () => {
+  test("zwykła data", () => {
+    equal(isValidDate("2026-10-13"), true);
+  });
+  test("30 lutego nie istnieje", () => {
+    equal(isValidDate("2026-02-30"), false);
+  });
+  test("29 lutego tylko w roku przestępnym", () => {
+    equal([isValidDate("2028-02-29"), isValidDate("2026-02-29")], [true, false]);
+  });
+  test("miesiąc 13 nie istnieje", () => {
+    equal(isValidDate("2026-13-01"), false);
+  });
+  test("bez zer z przodu to zły format", () => {
+    equal(isValidDate("2026-1-5"), false);
+  });
+  test("rok 0000 nie istnieje", () => {
+    equal(isValidDate("0000-01-01"), false);
+  });
+  test("liczba i brak wartości to nie data", () => {
+    equal([isValidDate(20261013), isValidDate(null)], [false, false]);
+  });
+});
+
+describe("isValidTime", () => {
+  test("od 00:00 do 23:59", () => {
+    equal([isValidTime("00:00"), isValidTime("07:40"), isValidTime("23:59")], [true, true, true]);
+  });
+  test("24:00 to już następny dzień", () => {
+    equal(isValidTime("24:00"), false);
+  });
+  test("60 minut nie ma", () => {
+    equal(isValidTime("12:60"), false);
+  });
+  test("bez zera z przodu i z sekundami to zły format", () => {
+    equal([isValidTime("7:40"), isValidTime("07:40:00")], [false, false]);
+  });
+});
+
+describe("formatDate", () => {
+  test("data do pokazania na ekranie", () => {
+    equal(formatDate("2026-10-13"), "13.10.2026");
   });
 });

@@ -55,7 +55,7 @@ js/report.js              tekst raportu w Markdown (jeszcze nie ma)
 js/vendor/                Chart.js i supabase-js z licencjami (jeszcze nie ma)
 js/views/today.js         ekran Dziś, opis bloku, lista dnia
 js/views/progress.js      wykres i sumy
-js/views/tasks.js         zadania, eksport, import, wylogowanie
+js/views/tasks.js         zadania, eksport, import, panel uszkodzonych danych, wylogowanie
 js/views/login.js         ekran logowania (wersja z bazą; jeszcze nie ma)
 js/tests/                 testy logiki
 ```
@@ -66,7 +66,9 @@ js/tests/                 testy logiki
 - Widoki nigdy nie używają `localStorage` ani Supabase bezpośrednio, tylko modułu `storage`. Moduł wybiera `app.js`, więc przejście na bazę to zmiana jednego importu.
 - Widoki zmieniają dane przez obiekt `actions` z `app.js` (np. `actions.addBlock(taskId)`), przekazywany jako trzeci argument `render(container, state, actions)`.
 - Oba moduły zapisu mają ten sam, asynchroniczny interfejs (zwracają `Promise`, także wersja lokalna):
-  `load()`, `addBlock(block)`, `updateBlock(block)` (np. dopisany opis), `deleteBlock(id)`, `saveTask(task)` (dodaje albo aktualizuje), `replaceAll(data)`, `exportAll()`.
+  `load()`, `addBlock(block)`, `updateBlock(block)` (np. dopisany opis), `deleteBlock(id)`, `saveTask(task)` (dodaje albo aktualizuje), `replaceAll(data)`, `exportAll()`, `loadLastExportDate()`, `saveLastExportDate(date)`.
+- Datę ostatniego eksportu obie wersje trzymają w `localStorage` (klucz `organizerNaukiLastExport`): to informacja o tej przeglądarce, nie część kopii.
+- Gdy zapisanych danych nie da się odczytać, błąd z `load()` w wersji lokalnej ma pole `rawText` (surowy tekst do „Pobierz uszkodzone dane”). Uszkodzonych danych nigdy nie nadpisujemy danymi startowymi.
 - Logika liczenia (sumy, cele, zakresy dni) i sprawdzanie importu w `model.js` i `dates.js`, nie w widokach. Funkcje liczące dostają listę bloków jako argument, a nie czytają globalnego stanu.
 - Przerysowanie widoku (po zapisie, o północy, po odświeżeniu danych) nie może skasować wpisywanego tekstu: otwarte pole i wpisany tekst trzymaj w `state`, a nie tylko na stronie.
 - Bez `alert()`, `confirm()` i `prompt()`: potwierdzenia („Usunąć? Tak / Nie”) i komunikaty pokazuj na stronie. Okno przeglądarki blokuje stronę, a narzędzia podglądu Claude Code często nie umieją go kliknąć.

@@ -1,4 +1,5 @@
-// Ekran „Dziś”: suma dnia, licznik łączny i kafelki zadań.
+// Ekran „Dziś”: suma dnia, licznik łączny (przy 0 blokach z linkiem do importu kopii)
+// i kafelki zadań.
 // Opis bloku (F2) oraz lista dnia, usuwanie i dopisywanie po fakcie (F3) dochodzą później.
 //
 // Elementy tworzymy przez createElement i textContent, a nie przez innerHTML:
@@ -23,7 +24,7 @@ export function render(container, state, actions) {
 
   const header = document.createElement("div");
   header.className = "today-header";
-  header.append(renderDaySummary(state.data.tasks, todayBlocks), renderTotal(state.data.blocks));
+  header.append(renderDaySummary(state.data.tasks, todayBlocks), renderTotal(state.data.blocks, actions));
 
   container.replaceChildren(header);
 
@@ -45,8 +46,9 @@ function renderDaySummary(tasks, todayBlocks) {
 }
 
 // „Łącznie: 312 bloków · 130 h”: wszystkie bloki od początku, widoczne od razu
-// po otwarciu strony. Przy 0 blokach z podpowiedzią pod spodem.
-function renderTotal(blocks) {
+// po otwarciu strony. Przy 0 blokach z podpowiedzią i linkiem do importu kopii:
+// po wyczyszczeniu przeglądarki aplikacja po cichu zaczyna od nowa i łatwo to przeoczyć.
+function renderTotal(blocks, actions) {
   const box = document.createElement("div");
   box.className = "total";
 
@@ -57,7 +59,14 @@ function renderTotal(blocks) {
   if (blocks.length === 0) {
     const hint = document.createElement("p");
     hint.className = "total-hint";
-    hint.textContent = "Tu będzie widać Twój postęp";
+
+    const importLink = document.createElement("button");
+    importLink.type = "button";
+    importLink.className = "link-button";
+    importLink.textContent = "Masz kopię? Importuj";
+    importLink.addEventListener("click", () => actions.chooseImportFile());
+
+    hint.append("Tu będzie widać Twój postęp · ", importLink);
     box.append(hint);
   }
   return box;

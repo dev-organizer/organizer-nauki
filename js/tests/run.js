@@ -4,6 +4,7 @@
 import { runTests } from "./check.js";
 import "./dates.test.js";
 import "./model.test.js";
+import "./import.test.js";
 
 const summary = document.getElementById("summary");
 const timeZoneInfo = document.getElementById("time-zone");

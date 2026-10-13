@@ -12,6 +12,9 @@
   /* Zielony ✓ przy osiągniętym celu. Ciemniejszy niż zielony Rysunku,
      żeby był dobrze widoczny na tle każdego kafelka. */
   --done: #1e6b24;
+  /* Ostrzeżenie przy imporcie: ciemny pasek i jasnoszare tło, bez czerwieni i pomarańczu
+     (to kolory zadań Frontend i Claude Code). */
+  --warning-background: #eceff1;
 }
 
 * {
@@ -49,6 +52,11 @@ nav button {
   border: none;
   border-bottom: 3px solid transparent;
   color: var(--text-muted);
+}
+
+/* Bez tego display: flex nadpisałby atrybut hidden (panel uszkodzonych danych chowa zakładki). */
+nav[hidden] {
+  display: none;
 }
 
 nav button[aria-current="page"] {
@@ -149,6 +157,14 @@ main {
   font-size: 0.875rem;
 }
 
+/* Przycisk, który wygląda jak link, np. „Masz kopię? Importuj”. */
+.link-button {
+  padding: 0;
+  border: none;
+  background: none;
+  text-decoration: underline;
+}
+
 /* Dziedziny i kafelki */
 
 .domain h2 {
@@ -229,4 +245,86 @@ main {
   font-size: 1.5rem;
   font-weight: 700;
   color: var(--done);
+}
+
+/* Zakładka „Zadania”: kopia zapasowa. Panel uszkodzonych danych używa tych samych przycisków. */
+
+.backup h2,
+#damaged h2 {
+  margin: 1.5rem 0 0.5rem;
+  font-size: 1.1rem;
+}
+
+.backup-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.backup button,
+#damaged button {
+  padding: 0.5rem 1rem;
+  border: 1px solid var(--border);
+  border-radius: 0.375rem;
+  background: var(--surface);
+}
+
+.backup button:hover,
+#damaged button:hover {
+  border-color: var(--text);
+}
+
+.backup-notice {
+  margin: 0.75rem 0;
+}
+
+/* Błąd na ciemnym tle, jak komunikat na dole okna. Nigdy na czerwono. */
+.backup-error {
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.375rem;
+  background: var(--notice-background);
+  color: var(--notice-text);
+}
+
+/* Potwierdzenie importu: wyraźna ramka, bo „Tak” zastępuje wszystkie dane. */
+.import-offer {
+  margin: 0.75rem 0;
+  padding: 0.75rem 1rem;
+  border: 2px solid var(--text);
+  border-radius: 0.5rem;
+  background: var(--surface);
+}
+
+.import-offer p {
+  margin: 0 0 0.5rem;
+}
+
+.import-question {
+  font-weight: 600;
+}
+
+.import-warning {
+  padding: 0.5rem 0.75rem;
+  border-left: 0.375rem solid var(--notice-background);
+  background: var(--warning-background);
+  font-weight: 600;
+}
+
+/* Panel zamiast zakładek, gdy zapisanych danych nie da się odczytać. */
+
+.damaged-steps {
+  padding-left: 1.25rem;
+}
+
+.damaged-steps li {
+  margin-bottom: 1rem;
+}
+
+.damaged-steps p {
+  margin: 0 0 0.5rem;
+}
+
+.damaged-retry {
+  margin-top: 1.5rem;
+  color: var(--text-muted);
 }

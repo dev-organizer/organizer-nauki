@@ -51,6 +51,34 @@ export function lastDays(count, endDate = todayString()) {
   return days;
 }
 
+// Liczba dni od jednej daty do drugiej: daysBetween("2026-10-04", "2026-10-13") → 9.
+// Zaokrąglamy, bo doba ze zmianą czasu ma 23 albo 25 godzin.
+export function daysBetween(fromDate, toDate) {
+  const milliseconds = parseDate(toDate) - parseDate(fromDate);
+  return Math.round(milliseconds / (24 * 60 * 60 * 1000));
+}
+
+// Czy tekst to istniejąca data "RRRR-MM-DD": "2026-02-28" tak, "2026-02-30" nie.
+// Sprawdzamy w obie strony: Date zamienia 30 lutego na 2 marca, więc po zamianie
+// z powrotem na tekst wychodzi inna data niż na wejściu.
+export function isValidDate(text) {
+  if (typeof text !== "string" || !/^\d{4}-\d{2}-\d{2}$/.test(text)) {
+    return false;
+  }
+  return toDateString(parseDate(text)) === text;
+}
+
+// Czy tekst to godzina "GG:MM" od 00:00 do 23:59: "07:40" tak, "24:00" i "7:40" nie.
+export function isValidTime(text) {
+  return typeof text === "string" && /^([01]\d|2[0-3]):[0-5]\d$/.test(text);
+}
+
+// Data do pokazania na ekranie: "2026-10-13" → "13.10.2026".
+export function formatDate(dateString) {
+  const [year, month, day] = dateString.split("-");
+  return `${day}.${month}.${year}`;
+}
+
 // Polski skrót dnia tygodnia: "2026-10-12" → "pn".
 export function dayShort(dateString) {
   return DAY_SHORT[parseDate(dateString).getDay()];
