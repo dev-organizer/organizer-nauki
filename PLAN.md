@@ -108,29 +108,17 @@ Sprawdzenie na komputerze w pracy (eksport działa i wiadomo, w którym folderze
 
 **Zrobione:** 13.10.2026.
 
-### Krok 3b. Osobny adres strony (1 blok)
+### Krok 3b. Osobny adres strony
 
-- **Opis.** Organizer przenosi się pod osobny adres w darmowej organizacji na GitHubie, zanim pod `kubiakraf.github.io` pojawią się inne projekty (np. z kursu frontendu). Wszystkie strony pod jednym adresem mają wspólny `localStorage`: mogą odczytać albo skasować dane organizera, a w wersji z bazą odczytać token sesji (SPEC.md, sekcja 7). Przeprowadzka danych to eksport na starym adresie i import na nowym (krok 3).
-- **Rezultat.** Projekty z kursu możesz publikować pod `kubiakraf.github.io` bez ryzyka dla danych organizera, a przypięta karta i kopie od początku działają pod docelowym adresem.
-- **Gotowe, gdy:** aplikacja działa pod nowym adresem z prawdziwymi danymi, a stary adres nie trzyma już danych organizera.
-- **Sprawdzenie:**
-  1. W pracy, jeszcze pod starym adresem: eksport prawdziwych danych. Od tej chwili bez klikania kafelków aż do importu (punkt 4), bo tych bloków nie byłoby w kopii.
-  2. Przeniesienie repozytorium do organizacji (Settings → General → Danger Zone → Transfer). Od tej chwili stary adres strony daje 404.
-  3. Nowy adres: strona, `tests.html`, konsola bez błędów (Ctrl+Shift+R).
-  4. W pracy pod nowym adresem: import kopii → licznik łączny jak przed eksportem. Zaraz potem eksport, bo „Ostatnia kopia” jest zapisana osobno dla każdego adresu.
-  5. Stary adres: klucze `organizerNauki` i `organizerNaukiLastExport` usunięte (F12 → Application → Local Storage; działa na każdej stronie pod `kubiakraf.github.io`, także na stronie błędu 404).
-  6. Nowy adres w przypiętej karcie. CLAUDE.md, SPEC.md, PLAN.md i ROADMAP.md mają nowy adres, a `origin` w gicie wskazuje nowe repozytorium.
-- **Zależności:** krok 3.
-- **Ryzyka:**
-  - GitHub przekierowuje stary adres przeniesionego repozytorium, ale nie stronę na GitHub Pages → najpierw eksport (sprawdzenie 1), dopiero potem przeniesienie;
-  - stare dane zostają w `localStorage` pod `kubiakraf.github.io`, z prywatnymi opisami bloków → sprawdzenie 5;
-  - inna strona dodana później pod nowy adres znów dzieliłaby `localStorage` → pod nowym adresem jest tylko organizer.
-- **Decyzje (14.10.2026):**
-  - organizacja `dev-organizer`;
-  - repozytorium przeniesione, a nie nowe: historia zostaje, a GitHub przekierowuje stary link do repozytorium (ale nie do strony);
-  - adres `https://dev-organizer.github.io/organizer-nauki/`, nazwa repozytorium bez zmian;
-  - w organizacji `dev-organizer` tylko organizer ma włączone GitHub Pages. Każde inne repozytorium z Pages trafiłoby pod ten sam adres i dzieliło `localStorage`, więc inne projekty idą pod `kubiakraf.github.io`.
-- **Do listy kontrolnej:** nic.
+Organizer przeniósł się pod osobny adres, zanim pod `kubiakraf.github.io` pojawią się inne projekty (np. z kursu frontendu). Wszystkie strony pod jednym adresem mają wspólny `localStorage`: mogą odczytać albo skasować dane organizera, a w wersji z bazą odczytać token sesji (SPEC.md, sekcja 7). Przeprowadzka: eksport pod starym adresem, przeniesienie repozytorium, import pod nowym adresem i od razu nowy eksport („Ostatnia kopia” jest zapisana osobno dla każdego adresu), na koniec usunięcie kluczy `organizerNauki` i `organizerNaukiLastExport` pod `kubiakraf.github.io`.
+
+Decyzje:
+
+- organizacja `dev-organizer`; repozytorium przeniesione, a nie nowe: historia zostaje, a GitHub przekierowuje stary link do repozytorium, ale nie do strony (stary adres strony daje 404);
+- adres `https://dev-organizer.github.io/organizer-nauki/`, nazwa repozytorium bez zmian; `origin` w gicie wskazuje nowe repozytorium;
+- w organizacji `dev-organizer` tylko organizer ma włączone GitHub Pages. Każde inne repozytorium z Pages trafiłoby pod ten sam adres i dzieliło `localStorage`, więc inne projekty idą pod `kubiakraf.github.io`.
+
+**Zrobione:** 14.10.2026.
 
 ### Krok 4a. Opis bloku, lista dnia, usuwanie (2 bloki)
 
