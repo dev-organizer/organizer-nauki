@@ -324,7 +324,7 @@ js/tests/                 testy logiki
 
 **Hosting to nie to samo co przechowywanie danych.** GitHub Pages tylko wysyła pliki aplikacji. W wersji lokalnej dane zostają w przeglądarce, osobno dla każdego komputera i adresu. W wersji z bazą dane są w bazie i każde urządzenie po zalogowaniu widzi to samo.
 
-**Wspólny adres to wspólny `localStorage`.** Wszystkie strony pod `kubiakraf.github.io`, także inne projekty na GitHub Pages (np. z kursu), mają jeden `localStorage`. Mogą odczytać albo skasować dane organizera (poradniki często używają `localStorage.clear()`), a w wersji z bazą odczytać token sesji. Dopóki organizer jest pod tym adresem, inne projekty lepiej publikować gdzie indziej. Decyzja o osobnym adresie jest w PLAN.md.
+**Wspólny adres to wspólny `localStorage`.** Wszystkie strony pod jednym adresem, np. `kubiakraf.github.io`, także inne projekty na GitHub Pages (np. z kursu), mają jeden `localStorage`. Mogą odczytać albo skasować dane innej strony (poradniki często używają `localStorage.clear()`), a w wersji z bazą odczytać token sesji. Dlatego organizer ma osobny adres w organizacji na GitHubie: `https://dev-organizer.github.io/organizer-nauki/`. W tej organizacji tylko organizer ma włączone GitHub Pages, bo każde inne repozytorium z Pages trafiłoby pod ten sam adres. Inne projekty idą pod `kubiakraf.github.io`.
 
 ## 8. Stos technologiczny
 

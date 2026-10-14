@@ -114,17 +114,22 @@ Sprawdzenie na komputerze w pracy (eksport działa i wiadomo, w którym folderze
 - **Rezultat.** Projekty z kursu możesz publikować pod `kubiakraf.github.io` bez ryzyka dla danych organizera, a przypięta karta i kopie od początku działają pod docelowym adresem.
 - **Gotowe, gdy:** aplikacja działa pod nowym adresem z prawdziwymi danymi, a stary adres nie trzyma już danych organizera.
 - **Sprawdzenie:**
-  1. W pracy, jeszcze pod starym adresem: eksport prawdziwych danych.
-  2. Nowy adres: strona, `tests.html`, konsola bez błędów (Ctrl+Shift+R).
-  3. W pracy pod nowym adresem: import kopii → licznik łączny jak przed eksportem.
-  4. Stary adres: klucze `organizerNauki` i `organizerNaukiLastExport` usunięte (F12 → Application → Local Storage; działa na każdej stronie pod `kubiakraf.github.io`, także na stronie błędu 404).
-  5. Nowy adres w przypiętej karcie. CLAUDE.md, SPEC.md i PLAN.md mają nowy adres.
+  1. W pracy, jeszcze pod starym adresem: eksport prawdziwych danych. Od tej chwili bez klikania kafelków aż do importu (punkt 4), bo tych bloków nie byłoby w kopii.
+  2. Przeniesienie repozytorium do organizacji (Settings → General → Danger Zone → Transfer). Od tej chwili stary adres strony daje 404.
+  3. Nowy adres: strona, `tests.html`, konsola bez błędów (Ctrl+Shift+R).
+  4. W pracy pod nowym adresem: import kopii → licznik łączny jak przed eksportem. Zaraz potem eksport, bo „Ostatnia kopia” jest zapisana osobno dla każdego adresu.
+  5. Stary adres: klucze `organizerNauki` i `organizerNaukiLastExport` usunięte (F12 → Application → Local Storage; działa na każdej stronie pod `kubiakraf.github.io`, także na stronie błędu 404).
+  6. Nowy adres w przypiętej karcie. CLAUDE.md, SPEC.md, PLAN.md i ROADMAP.md mają nowy adres, a `origin` w gicie wskazuje nowe repozytorium.
 - **Zależności:** krok 3.
 - **Ryzyka:**
   - GitHub przekierowuje stary adres przeniesionego repozytorium, ale nie stronę na GitHub Pages → najpierw eksport (sprawdzenie 1), dopiero potem przeniesienie;
-  - stare dane zostają w `localStorage` pod `kubiakraf.github.io`, z prywatnymi opisami bloków → sprawdzenie 4;
+  - stare dane zostają w `localStorage` pod `kubiakraf.github.io`, z prywatnymi opisami bloków → sprawdzenie 5;
   - inna strona dodana później pod nowy adres znów dzieliłaby `localStorage` → pod nowym adresem jest tylko organizer.
-- **Do rozstrzygnięcia:** nazwa organizacji (będzie w adresie strony); przeniesienie repozytorium do organizacji (historia i link z portfolio zostają) czy nowe repozytorium; adres `<nazwa>.github.io` (repozytorium o tej nazwie) czy `<nazwa>.github.io/organizer-nauki/`.
+- **Decyzje (14.10.2026):**
+  - organizacja `dev-organizer`;
+  - repozytorium przeniesione, a nie nowe: historia zostaje, a GitHub przekierowuje stary link do repozytorium (ale nie do strony);
+  - adres `https://dev-organizer.github.io/organizer-nauki/`, nazwa repozytorium bez zmian;
+  - w organizacji `dev-organizer` tylko organizer ma włączone GitHub Pages. Każde inne repozytorium z Pages trafiłoby pod ten sam adres i dzieliło `localStorage`, więc inne projekty idą pod `kubiakraf.github.io`.
 - **Do listy kontrolnej:** nic.
 
 ### Krok 4a. Opis bloku, lista dnia, usuwanie (2 bloki)
@@ -279,7 +284,7 @@ Ten krok to klikanie w panelu Supabase, nie kod. Konto zakładasz sam.
   - W SQL Editor SQL z sekcji 6.3 SPEC.md (tabele, uprawnienia, RLS).
   - Settings → API Keys: klucz `sb_publishable_…` do kodu strony. Starych kluczy `anon` i `service_role` (długie tokeny `eyJ…`) nie używamy, bo Supabase wycofuje je do końca 2026.
   - Dwa konta (Authentication → Users → Add user, z automatycznym potwierdzeniem): Twoje i testowe z adresem w domenie `@example.com`, np. `test@example.com`. Potem wyłączona rejestracja nowych kont.
-  - Site URL: `https://kubiakraf.github.io/organizer-nauki/` (albo nowy adres, jeśli zapadła taka decyzja w kroku 3).
+  - Site URL: `https://dev-organizer.github.io/organizer-nauki/` (adres z kroku 3b).
   - Advisors → Security Advisor i Performance Advisor bez błędów i ostrzeżeń (poziomy ERROR i WARN). Informacje (INFO) typu „Unused Index” są w świeżym projekcie normalne, bo indeksy nie były jeszcze używane.
   - Zapisany sposób odzyskania hasła. Hasła są w menedżerze haseł, a gdy hasło do Twojego konta zginie, pomaga link „Send password recovery” z panelu (Authentication → Users). Wbudowana poczta Supabase wysyła tylko na adresy osób z zespołu organizacji (zakładka Team), najwyżej ok. 2 maile na godzinę. Link dojdzie więc tylko wtedy, gdy Twoje konto w aplikacji ma ten sam adres co konto w Supabase albo gdy ten adres dodasz do zespołu; sprawdzamy to w tym kroku. Konto testowe (`@example.com`) maila nie dostanie: gdy jego hasło zginie, usuwasz jego bloki i zadania i zakładasz je od nowa. Co aplikacja robi z linkiem, rozstrzyga krok 10. Usunięcie Twojego konta nigdy nie jest rozwiązaniem: skasowałoby całą historię, dlatego baza na nie nie pozwala, dopóki konto ma dane (`on delete restrict`).
 - **Rezultat.** Baza i konta są gotowe i zabezpieczone, zanim powstanie kod.

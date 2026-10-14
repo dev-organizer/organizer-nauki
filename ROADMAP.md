@@ -19,7 +19,7 @@ Jak z niego korzystać:
 4. **Plan każdego przedsięwzięcia.** Kroki i stan dla większych celów (np. kurs, projekt do portfolio).
 5. **Podpowiedź „następne zadanie” i karta „Po co to robię”.** Podpowiedź wskazuje zadanie najbardziej w tyle względem celu dnia. Karta przypomina, po co jest dana nauka.
 6. **Zakładka zdrowia.** Sen, godzina pobudki, jedzenie, leki, później może dane z Oura. Wpisywane z telefonu, na tym samym koncie. Warunki:
-   - wcześniej osobny adres strony (własna domena albo organizacja na GitHubie), bo wszystkie strony pod `kubiakraf.github.io` mają wspólny `localStorage`, a w nim token sesji;
+   - osobny adres strony, bo strony pod jednym adresem mają wspólny `localStorage`, a w nim token sesji. Spełnione od kroku 3b (`dev-organizer.github.io`, gdzie tylko organizer ma GitHub Pages);
    - osobne tabele z RLS i taki sam test bezpieczeństwa jak przed wersją z bazą (PLAN.md);
    - samo przypomnienie o lekach zostaje w telefonie, bo strona w przeglądarce nie przypomni, gdy jest zamknięta.
 7. **Podsumowania AI przez API.** Zamiast ręcznego wklejania raportu do Claude. Klucz do AI tylko w funkcji po stronie Supabase (Edge Function), nigdy w kodzie strony.

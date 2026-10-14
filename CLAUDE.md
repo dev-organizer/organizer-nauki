@@ -20,7 +20,7 @@ Numery kroków są tylko w PLAN.md. Tu i w SPEC.md piszemy **wersja lokalna** (1
   - supabase-js 2.x, tylko w wersji z bazą: `js/vendor/supabase.js` (z `dist/umd/supabase.js`), w wersji aktualnej w dniu dodania, wpisanej tutaj i w SPEC.md. Zwykły `<script>` przed `app.js`; tworzy globalną zmienną `supabase`, więc klienta nazywaj inaczej: `const client = window.supabase.createClient(…)` (zapis `const supabase = supabase.createClient(…)` w module daje błąd „Cannot access 'supabase' before initialization”). Plik `+esm` z jsDelivr się nie nadaje: importuje kolejne pliki z jsDelivr.
 - Przeglądarka docelowa to Chrome 155 na komputerze w pracy (sprawdzone 13.10.2026). Nie używaj funkcji JavaScript ani CSS, których Chrome 155 nie zna (MDN, sekcja „Browser compatibility”). Telefon i czytnik Boox mogą mieć starsze przeglądarki: zanim aplikacja ma na nich działać, sprawdzamy, czego nie znają.
 - Dane: `localStorage` pod kluczem `organizerNauki`; w wersji z bazą przechodzą do Supabase.
-- Hosting: GitHub Pages pod adresem `https://kubiakraf.github.io/organizer-nauki/`. Plik `.nojekyll` musi zostać w repozytorium.
+- Hosting: GitHub Pages pod adresem `https://dev-organizer.github.io/organizer-nauki/` (repozytorium `dev-organizer/organizer-nauki`). Plik `.nojekyll` musi zostać w repozytorium.
 
 ## Uruchomienie i testy
 
@@ -108,7 +108,7 @@ Z sekcji 3 SPEC.md; obowiązują w każdym widoku:
 
 - Tekst wpisany przez użytkownika (nazwy zadań, opisy bloków, dane z importu) wstawiaj przez `textContent`, nigdy przez `innerHTML`.
 - Repozytorium jest publiczne: nie wpisuj do plików prywatnego e-maila ani innych danych osobowych. Kopie danych i pliki z danymi (`organizer-nauki-*`, `dane-testowe-*`) są w `.gitignore`; nie commituj ich. Pliki pobierane przez aplikację nazywaj tak, żeby pasowały do tych wzorców.
-- Wszystkie strony pod `kubiakraf.github.io` mają wspólny `localStorage`: inny projekt pod tym adresem może odczytać albo skasować dane organizera, a w wersji z bazą odczytać token sesji (SPEC.md, sekcja 7).
+- Wszystkie strony pod jednym adresem mają wspólny `localStorage`: inny projekt pod `dev-organizer.github.io` mógłby odczytać albo skasować dane organizera, a w wersji z bazą odczytać token sesji (SPEC.md, sekcja 7). Dlatego w organizacji `dev-organizer` tylko organizer ma włączone GitHub Pages, a inne projekty idą pod `kubiakraf.github.io`.
 - Żadnych kluczy do usług AI w kodzie strony (tylko w Edge Function, i to po MVP).
 - W wersji z bazą (Supabase):
   - adres projektu i klucz publiczny `sb_publishable_…` mogą być w kodzie strony. Dane chronią uprawnienia (`grant` tylko dla `authenticated`) i RLS z SPEC.md, sekcja 6.3; obie tabele muszą mieć RLS włączony. Starych kluczy `anon` i `service_role` (`eyJ…`) nie używamy;
