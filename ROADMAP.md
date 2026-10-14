@@ -2,13 +2,13 @@
 
 Wersja 1 · 12 października 2026
 
-Pomysły na czas po MVP i warunki, których dzisiejsze decyzje nie mogą zablokować. [SPEC.md](SPEC.md) mówi, czym jest MVP, [PLAN.md](PLAN.md) mówi, jak do niego dochodzimy, a ten plik mówi, dokąd aplikacja może pójść potem.
+Pomysły na czas po MVP i warunki, których dzisiejsze decyzje nie mogą zablokować. [SPEC.md](SPEC.md) mówi, czym jest MVP, [GitHub Issues](https://github.com/dev-organizer/organizer-nauki/issues) mówią, jak do niego dochodzimy, a ten plik mówi, dokąd aplikacja może pójść potem.
 
 Jak z niego korzystać:
 
 - Przed decyzją o formacie danych, interfejsie zapisu, bazie, adresie strony albo układzie widoków przejrzyj sekcję „Czego nie zablokować”. Jeśli decyzja utrudnia któryś pomysł, powiedz to przed zmianą.
 - Nowy pomysł z pracy nad krokiem trafia tutaj, a nie do kodu.
-- Gdy pomysł wchodzi do budowy, dostaje kroki w PLAN.md i opis w SPEC.md, a stąd znika.
+- Gdy pomysł wchodzi do budowy, dostaje kroki (issues w kamieniu milowym) i opis w SPEC.md, a stąd znika.
 - Kolejność to priorytet na dziś. Zmieniamy ją, gdy dane z aplikacji pokażą coś innego.
 
 ## Pomysły, w kolejności priorytetów
@@ -20,7 +20,7 @@ Jak z niego korzystać:
 5. **Podpowiedź „następne zadanie” i karta „Po co to robię”.** Podpowiedź wskazuje zadanie najbardziej w tyle względem celu dnia. Karta przypomina, po co jest dana nauka.
 6. **Zakładka zdrowia.** Sen, godzina pobudki, jedzenie, leki, później może dane z Oura. Wpisywane z telefonu, na tym samym koncie. Warunki:
    - osobny adres strony, bo strony pod jednym adresem mają wspólny `localStorage`, a w nim token sesji. Spełnione od kroku 3b (`dev-organizer.github.io`, gdzie tylko organizer ma GitHub Pages);
-   - osobne tabele z RLS i taki sam test bezpieczeństwa jak przed wersją z bazą (PLAN.md);
+   - osobne tabele z RLS i taki sam test bezpieczeństwa jak przed wersją z bazą (krok 12, issue #18);
    - samo przypomnienie o lekach zostaje w telefonie, bo strona w przeglądarce nie przypomni, gdy jest zamknięta.
 7. **Podsumowania AI przez API.** Zamiast ręcznego wklejania raportu do Claude. Klucz do AI tylko w funkcji po stronie Supabase (Edge Function), nigdy w kodzie strony.
 8. **Własny minutnik.** Z automatyczną pauzą przy zmianie karty. Bloki mogłyby wtedy mieć inną długość niż 25 minut (pole `minutes`).

@@ -2,9 +2,9 @@
 
 Dziennik 25-minutowych bloków nauki dla jednej osoby: jedno kliknięcie w kafelek zapisuje blok, kafelki pokazują „zrobione / cel”, wykres pokazuje postęp z dnia na dzień.
 
-**Źródłem prawdy są [SPEC.md](SPEC.md) (czym jest aplikacja: funkcje, dane, architektura) i [PLAN.md](PLAN.md) (kroki budowy, stan prac, lista kontrolna). [ROADMAP.md](ROADMAP.md) zbiera pomysły po MVP i warunki, których MVP nie może zablokować.** Przed każdym krokiem przeczytaj krok w PLAN.md i funkcje (F1–F8) ze SPEC.md, do których się odwołuje. Jeśli kod, CLAUDE.md, SPEC.md, PLAN.md i ROADMAP.md się różnią, zapytaj, zamiast zgadywać. Gdy zmieniasz zasadę zapisaną w kilku plikach, popraw ją we wszystkich.
+**Źródłem prawdy są [SPEC.md](SPEC.md) (czym jest aplikacja: funkcje, dane, architektura) i [GitHub Issues](https://github.com/dev-organizer/organizer-nauki/issues) (kroki budowy i stan prac: jedno issue to jeden krok, kamień milowy to etap). Zasady pracy i lista kontrolna są w tym pliku. [ROADMAP.md](ROADMAP.md) zbiera pomysły po MVP i warunki, których MVP nie może zablokować.** Przed każdym krokiem przeczytaj jego issue i funkcje (F1–F8) ze SPEC.md, do których się odwołuje. Jeśli kod, CLAUDE.md, SPEC.md, issues i ROADMAP.md się różnią, zapytaj, zamiast zgadywać. Gdy zmieniasz zasadę zapisaną w kilku miejscach, popraw ją we wszystkich.
 
-Numery kroków są tylko w PLAN.md. Tu i w SPEC.md piszemy **wersja lokalna** (1.0: dane w `localStorage`, jedna przeglądarka) i **wersja z bazą** (1.1: logowanie i dane w Supabase).
+Numery kroków (0a, 4b, 11a…) są w tytułach issues i nie są numerami issues (krok 4a to #8). SPEC.md nie używa numerów kroków, tylko nazw **wersja lokalna** (1.0: dane w `localStorage`, jedna przeglądarka) i **wersja z bazą** (1.1: logowanie i dane w Supabase), więc zmiana kolejności kroków nie wymaga w nim poprawek.
 
 ## Komunikacja
 
@@ -31,16 +31,12 @@ Numery kroków są tylko w PLAN.md. Tu i w SPEC.md piszemy **wersja lokalna** (1
 - Testy: `tests.html` na tym samym serwerze pokazuje, które testy przeszły, a które nie i dlaczego. Sprawdzają logikę z `model.js`, `dates.js` i `report.js`, bez bibliotek.
 - Testy nie dotykają `localStorage`: `tests.html` jest też na GitHub Pages, obok prawdziwych danych.
 - Testy piszemy w `js/tests/*.test.js` funkcjami `describe`, `test`, `equal` i `throwsError` z `js/tests/check.js`, z datą i godziną podanymi wprost. Nowy plik testów dopisz do importów w `js/tests/run.js`.
-- Krok jest skończony, gdy:
-  1. przechodzą wszystkie testy, nie tylko nowe;
-  2. warunek „Gotowe, gdy” i scenariusz „Sprawdzenie” z kroku w PLAN.md są wykonane w przeglądarce, a konsola (F12) jest bez błędów;
-  3. przechodzi lista kontrolna z PLAN.md, razem z punktami, które ten krok do niej dopisał.
 - Sprawdzaj na serwerze lokalnym. Ma osobny `localStorage`, więc klikanie nie zmienia prawdziwych danych z GitHub Pages. W wersji z bazą baza jest wspólna: na serwerze lokalnym tylko konto testowe (pilnuje tego też kod logowania).
-- GitHub Pages po pushu sprawdzaj tylko do odczytu (strona, `tests.html`, konsola), bez klikania kafelków. Przeglądarka trzyma pliki do 10 minut, więc najpierw Ctrl+Shift+R.
+- Kiedy krok jest skończony, mówi sekcja „Krok jest skończony, gdy” niżej; wdrożenie i sprawdzanie GitHub Pages: sekcja „Wdrożenie”.
 
 ## Struktura plików
 
-Docelowa struktura (SPEC.md, sekcja 7). Pliki z dopiskiem „jeszcze nie ma” powstają dopiero w kroku z PLAN.md, który ich potrzebuje; nie twórz ich wcześniej, a tworząc plik, usuń dopisek.
+Docelowa struktura (SPEC.md, sekcja 7). Pliki z dopiskiem „jeszcze nie ma” powstają dopiero w kroku (issue), który ich potrzebuje; nie twórz ich wcześniej, a tworząc plik, usuń dopisek.
 
 ```
 index.html                szkielet i trzy zakładki: Dziś, Postęp, Zadania
@@ -122,15 +118,49 @@ Z sekcji 3 SPEC.md; obowiązują w każdym widoku:
 - Nazwy w kodzie po angielsku (jak w SPEC.md: `addBlock`, `dailyGoal`), teksty interfejsu po polsku. Krótkie komentarze po polsku tam, gdzie powód nie jest oczywisty z kodu.
 - Wcięcie 2 spacje, cudzysłowy podwójne, średniki.
 
+## Plan w GitHub Issues
+
+- Plan to issues w repozytorium `dev-organizer/organizer-nauki`: jedno issue to jeden krok, a kamień milowy (milestone) to etap (Etap 1–5). Czytasz je i zmieniasz przez `gh` (GitHub CLI, zalogowany na koncie użytkownika), np. `gh issue list`, `gh issue view 8`.
+- Następny krok to otwarte issue kroku z najniższym numerem (`gh issue list --state open`): issues kroków powstały w kolejności planu.
+- Issue kroku ma punkty: **Opis** (co powstaje), **Rezultat** (co użytkownik może potem zrobić), **Gotowe, gdy** (warunek ukończenia), **Sprawdzenie** (co kliknąć i co zobaczyć, które testy), **Zależności**, **Ryzyka** (i co z nimi robimy), **Do rozstrzygnięcia** (pytania na początek sesji) i **Do listy kontrolnej** (co krok dopisuje do listy). F1–F8 to funkcje ze SPEC.md, sekcja 4.
+- Nowy krok (np. pomysł z ROADMAP.md, który wchodzi do budowy) to nowe issue z tymi punktami, w kamieniu milowym swojego etapu, zakładane po zgodzie użytkownika. Krok to 1–3 bloki Claude Code i kończy się czymś, co działa i co da się sprawdzić.
+- Szacunki bloków przy krokach to nie terminy: dłuższy krok to informacja, nie porażka.
+
 ## Zakres i sposób pracy
 
-- Jeden krok z PLAN.md na sesję. Nie wykonuj kroków naprzód.
-- Sesję kroku zaczynaj od planu i pytań z punktu „Do rozstrzygnięcia” przy kroku w PLAN.md. Kod dopiero po decyzjach użytkownika.
+- Jeden krok na sesję. Nie wykonuj kroków naprzód.
+- Sesja kroku zaczyna się od promptu w rodzaju: „Przeczytaj issue kroku 4a. Wypisz plan i pytania z »Do rozstrzygnięcia«; kodu jeszcze nie pisz.” Odpowiadasz planem i pytaniami z punktu „Do rozstrzygnięcia”. Kod dopiero po decyzjach użytkownika.
 - W kroku zmieniaj tylko to, czego krok wymaga. Poprawki „przy okazji” (porządki w kodzie, zmiany nazw, wygląd) najpierw zaproponuj.
 - Nie dodawaj rzeczy spoza MVP (SPEC.md, sekcja 5). Nowy pomysł w trakcie pracy dopisz do ROADMAP.md, nie do kodu.
 - Przy decyzji o formacie danych, interfejsie zapisu, bazie, adresie strony albo układzie widoków sprawdź sekcję „Czego nie zablokować” w ROADMAP.md. Jeśli decyzja utrudnia któryś pomysł z ROADMAP.md, powiedz to użytkownikowi przed zmianą.
 - Nowa logika w `model.js`, `dates.js` albo `report.js` dostaje testy w tym samym kroku.
-- Plan prowadzimy w PLAN.md. Po skończonym kroku dopisz przy nim „**Zrobione:** DD.MM.RRRR”, a do listy kontrolnej punkty z „Do listy kontrolnej”. Gdy decyzja zmienia to, co opisuje SPEC.md (funkcje, dane, architekturę), popraw SPEC.md w tym samym commicie.
-- Po działającym kroku zaproponuj commit; commit i push rób po zgodzie użytkownika. GitHub Pages aktualizuje stronę po ok. minucie.
-- Opisy commitów po polsku, w trybie rozkazującym, jak w historii („Dodaj …”, „Popraw …”).
+- Gdy decyzja zmienia to, co opisuje SPEC.md (funkcje, dane, architekturę), popraw SPEC.md w tym samym commicie.
+- Po działającym kroku zaproponuj commit; commit i push rób po zgodzie użytkownika. Wyjątek: krok, którego issue każe pracować na osobnej gałęzi (krok 11a).
+- Opisy commitów po polsku, w trybie rozkazującym, jak w historii („Dodaj …”, „Popraw …”), z numerem issue na końcu pierwszej linii, np. „Dodaj opis bloku i listę dnia (#8)”: GitHub pokaże wtedy commit w issue.
+- Po pushu zamknij issue: `gh issue close <numer> --comment "…"` z „**Zrobione:** DD.MM.RRRR” i krótką listą decyzji z kroku. W opisie issue zaznacz wykonane punkty „Sprawdzenie” i „Do rozstrzygnięcia”.
 - Nie zmieniaj lokalnej konfiguracji gita (e-mail w repozytorium to adres GitHub noreply). Folder `.claude/` jest w `.gitignore`; nie commituj go.
+
+## Krok jest skończony, gdy
+
+1. spełnione jest „Gotowe, gdy” z issue, a scenariusz „Sprawdzenie” przeszedł w przeglądarce na serwerze lokalnym;
+2. przechodzą wszystkie testy w `tests.html`, nie tylko nowe;
+3. konsola przeglądarki (F12) jest bez błędów;
+4. przechodzi lista kontrolna (niżej), razem z punktami, które ten krok do niej dopisał;
+5. decyzje z kroku są w SPEC.md, a po commicie i pushu (za zgodą użytkownika) issue jest zamknięte z „**Zrobione:**” i datą.
+
+## Lista kontrolna (2–5 minut)
+
+Jedna lista zamiast warunków rozrzuconych po krokach. Przechodzisz ją na serwerze lokalnym na końcu każdego kroku; w wersji z bazą na koncie testowym. Krok, który dodaje funkcję, dopisuje tu jeden punkt (z „Do listy kontrolnej” w swoim issue), w tym samym commicie co krok. Punkty oznaczone krokiem obowiązują od jego ukończenia.
+
+1. `tests.html`: wszystkie testy przechodzą (od kroku 2b).
+2. Strona się otwiera: kafelki w trzech dziedzinach, suma dnia i licznik łączny widoczne od razu (licznik od kroku 2b).
+3. Kliknięcie kafelka: kafelek, suma dnia i licznik łączny rosną o 1.
+4. Odświeżenie strony: stan zostaje.
+5. Przejście przez wszystkie zakładki: konsola (F12) bez błędów.
+6. Eksport pobiera plik. Import tego pliku → potwierdzenie z liczbą bloków → Nie: dane bez zmian (od kroku 3).
+
+## Wdrożenie
+
+- Push na `main` publikuje stronę na GitHub Pages po ok. minucie. Odczekaj ok. 2 minuty i odśwież stronę przez Ctrl+Shift+R: przeglądarka trzyma pliki strony do 10 minut, a mieszanka starych i nowych plików daje błędy.
+- Produkcję sprawdzaj tylko do odczytu, bez klikania kafelków: strona się otwiera, `tests.html` przechodzi, konsola jest bez błędów.
+- Gdy wdrożenie coś zepsuje: `git revert` ostatniego commita i push, a naprawa na spokojnie, w kolejnej sesji. Jeśli zepsuty commit zmieniał format danych (`version`), sam revert nie wystarczy: przeglądarka, która raz otworzyła nową wersję, ma już dane w nowym formacie, a stary kod je odrzuci. Wtedy revert i import kopii sprzed zmiany (sekcja „Dane”).

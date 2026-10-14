@@ -4,9 +4,9 @@ Wersja 7 · 13 października 2026
 
 Prosty dziennik 25-minutowych bloków nauki. Jedno kliknięcie zapisuje blok, kafelki pokazują postęp dnia względem celu, a wykres pokazuje postęp z dnia na dzień.
 
-Ten plik opisuje, czym jest aplikacja. Plan budowy krok po kroku, stan prac i lista kontrolna są w [PLAN.md](PLAN.md), a pomysły na czas po MVP w [ROADMAP.md](ROADMAP.md).
+Ten plik opisuje, czym jest aplikacja. Plan budowy krok po kroku i stan prac są w [GitHub Issues](https://github.com/dev-organizer/organizer-nauki/issues) (jedno issue to jeden krok, kamień milowy to etap), zasady pracy i lista kontrolna w [CLAUDE.md](CLAUDE.md), a pomysły na czas po MVP w [ROADMAP.md](ROADMAP.md).
 
-Aplikacja powstaje w dwóch wersjach: **wersja lokalna** (1.0: dane w przeglądarce, na jednym komputerze) i **wersja z bazą** (1.1: logowanie i dane w Supabase, na każdym urządzeniu). Numery kroków budowy są tylko w PLAN.md.
+Aplikacja powstaje w dwóch wersjach: **wersja lokalna** (1.0: dane w przeglądarce, na jednym komputerze) i **wersja z bazą** (1.1: logowanie i dane w Supabase, na każdym urządzeniu). Numery kroków budowy są tylko w issues.
 
 ## 1. Problem
 
